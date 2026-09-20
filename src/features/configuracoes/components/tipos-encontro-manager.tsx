@@ -23,21 +23,12 @@ export function TiposEncontroManager({ inicial }: { inicial: TipoEncontro[] }) {
     const nome = novo.nome.trim();
     if (!nome) return;
     startTransition(async () => {
-      await criarTipoEncontro({
+      const criado = await criarTipoEncontro({
         nome,
         cor: novo.cor,
         duracao_padrao_minutos: novo.duracao,
       });
-      setTipos((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          nome,
-          cor: novo.cor,
-          duracao_padrao_minutos: novo.duracao,
-          ativo: true,
-        } as TipoEncontro,
-      ]);
+      setTipos((prev) => [...prev, criado]);
       setNovo({ nome: "", cor: "#2F6B4F", duracao: 120 });
     });
   }

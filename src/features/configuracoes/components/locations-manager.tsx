@@ -19,16 +19,8 @@ export function LocationsManager({ inicial }: { inicial: Location[] }) {
     const nome = novo.nome.trim();
     if (!nome) return;
     startTransition(async () => {
-      await criarLocal({ nome, endereco: novo.endereco || undefined });
-      setLocais((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          nome,
-          endereco: novo.endereco || null,
-          ativo: true,
-        } as Location,
-      ]);
+      const criado = await criarLocal({ nome, endereco: novo.endereco || undefined });
+      setLocais((prev) => [...prev, criado]);
       setNovo({ nome: "", endereco: "" });
     });
   }

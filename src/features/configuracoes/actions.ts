@@ -36,9 +36,10 @@ export async function atualizarPerfisNomes(dados: PerfisNomesSettings) {
 export async function criarGat(nome: string) {
   await exigirCoordenacao();
   const supabase = await createClient();
-  const { error } = await supabase.from("gats").insert({ nome });
-  if (error) throw new Error(error.message);
+  const { data, error } = await supabase.from("gats").insert({ nome }).select().single();
+  if (error || !data) throw new Error(error?.message ?? "Erro ao criar GAT.");
   revalidatePath("/configuracoes");
+  return data;
 }
 
 export async function renomearGat(id: string, nome: string) {
@@ -64,9 +65,14 @@ export async function criarTipoEncontro(dados: {
 }) {
   await exigirCoordenacao();
   const supabase = await createClient();
-  const { error } = await supabase.from("meeting_types").insert(dados);
-  if (error) throw new Error(error.message);
+  const { data, error } = await supabase
+    .from("meeting_types")
+    .insert(dados)
+    .select()
+    .single();
+  if (error || !data) throw new Error(error?.message ?? "Erro ao criar tipo de encontro.");
   revalidatePath("/configuracoes");
+  return data;
 }
 
 export async function atualizarTipoEncontro(
@@ -94,9 +100,10 @@ export async function alternarAtivoTipoEncontro(id: string, ativo: boolean) {
 export async function criarLocal(dados: { nome: string; endereco?: string }) {
   await exigirCoordenacao();
   const supabase = await createClient();
-  const { error } = await supabase.from("locations").insert(dados);
-  if (error) throw new Error(error.message);
+  const { data, error } = await supabase.from("locations").insert(dados).select().single();
+  if (error || !data) throw new Error(error?.message ?? "Erro ao criar local.");
   revalidatePath("/configuracoes");
+  return data;
 }
 
 export async function atualizarLocal(

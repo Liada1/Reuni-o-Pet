@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { BotaoCopiar } from "@/components/ui/botao-copiar";
 import { remarcarReuniao, cancelarReuniao } from "../actions";
 import { mensagemRemarcacaoCancelamento, linkWhatsApp } from "@/lib/whatsapp";
-import { formatarDataHoraCompleta, paraInputData, paraInputHora } from "@/lib/dates";
+import { formatarDataHoraCompleta, paraInputData, paraInputHora, paraUtc } from "@/lib/dates";
 import type { ReuniaoComDetalhes } from "../types";
 
 export function ReuniaoAcoes({
@@ -40,7 +40,7 @@ export function ReuniaoAcoes({
             status: "remarcada",
             motivo,
             dataHoraFormatada: formatarDataHoraCompleta(
-              new Date(`${dataISO}T${horaMinuto}:00`).toISOString(),
+              paraUtc(dataISO, horaMinuto, fusoHorario).toISOString(),
               fusoHorario,
             ),
           }),

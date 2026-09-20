@@ -10,10 +10,12 @@ import { Surface } from "@/components/ui/surface";
 import { formatarDiaSemana, formatarData, formatarHora } from "@/lib/dates";
 
 export default async function PainelPage() {
-  const perfil = await getCurrentProfile();
+  const [perfil, programa, proximaReuniao] = await Promise.all([
+    getCurrentProfile(),
+    getProgramaSettings(),
+    getProximaReuniao(),
+  ]);
   const coordenacao = isCoordenacao(perfil);
-  const programa = await getProgramaSettings();
-  const proximaReuniao = await getProximaReuniao();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">

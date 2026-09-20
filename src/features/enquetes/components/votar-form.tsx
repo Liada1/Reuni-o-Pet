@@ -23,6 +23,7 @@ export function VotarForm({ poll, fusoHorario, meusVotosIniciais, meuId }: Votar
   const [comentario, setComentario] = useState("");
   const [pending, startTransition] = useTransition();
   const [salvo, setSalvo] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   function alternar(optionId: string, valor: PollVoto) {
     setSalvo(false);
@@ -37,11 +38,16 @@ export function VotarForm({ poll, fusoHorario, meusVotosIniciais, meuId }: Votar
       .filter((entrada): entrada is [string, PollVoto] => !!entrada[1])
       .map(([optionId, valor]) => ({ optionId, valor }));
 
+    setErro(null);
     startTransition(async () => {
-      await votar(poll.id, votos, comentario);
-      setComentario("");
-      setSalvo(true);
-      router.refresh();
+      try {
+        await votar(poll.id, votos, comentario);
+        setComentario("");
+        setSalvo(true);
+        router.refresh();
+      } catch (e) {
+        setErro(e instanceof Error ? e.message : "Não foi possível salvar o voto.");
+      }
     });
   }
 
@@ -100,6 +106,7 @@ export function VotarForm({ poll, fusoHorario, meusVotosIniciais, meuId }: Votar
         />
       </div>
 
+      {erro && <p className="text-sm text-alert">{erro}</p>}
       <div className="flex items-center gap-3">
         <Button type="button" onClick={salvar} disabled={pending}>
           {pending ? "Salvando…" : "Salvar voto"}

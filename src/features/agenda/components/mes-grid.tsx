@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { isSameMonth, isToday, format } from "date-fns";
+import { isSameMonth, isSameDay, format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { formatarHora, paraInputData } from "@/lib/dates";
 import type { ReuniaoComDetalhes } from "../types";
@@ -7,11 +7,13 @@ import type { ReuniaoComDetalhes } from "../types";
 interface MesGridProps {
   dias: Date[];
   mesAncora: Date;
+  /** "Hoje" já calculado no fuso horário do grupo (não o do servidor). */
+  hoje: Date;
   reunioes: ReuniaoComDetalhes[];
   fusoHorario: string;
 }
 
-export function MesGrid({ dias, mesAncora, reunioes, fusoHorario }: MesGridProps) {
+export function MesGrid({ dias, mesAncora, hoje, reunioes, fusoHorario }: MesGridProps) {
   return (
     <div className="grid grid-cols-7 gap-px overflow-hidden rounded-[var(--radius-panel)] border border-border bg-border">
       {["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"].map((d) => (
@@ -34,7 +36,7 @@ export function MesGrid({ dias, mesAncora, reunioes, fusoHorario }: MesGridProps
               className={cn(
                 "font-mono text-xs",
                 isSameMonth(dia, mesAncora) ? "text-ink-muted" : "text-ink-muted/40",
-                isToday(dia) && "font-semibold text-primary",
+                isSameDay(dia, hoje) && "font-semibold text-primary",
               )}
             >
               {format(dia, "d")}

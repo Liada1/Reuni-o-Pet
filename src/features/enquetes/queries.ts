@@ -102,6 +102,19 @@ export async function getMembrosElegiveis(poll: Poll): Promise<MembroElegivel[]>
   return (data as MembroElegivel[]) ?? [];
 }
 
+/** Só a contagem de votantes distintos de uma enquete, sem o payload
+ * pesado (opções com locais/perfis) que getEnquetePorId carrega. */
+async function contarVotantesUnicos(pollId: string): Promise<number> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("poll_options")
+    .select("poll_votes(profile_id)")
+    .eq("poll_id", pollId);
+  const linhas = (data ?? []) as unknown as { poll_votes: { profile_id: string }[] }[];
+  const ids = new Set(linhas.flatMap((o) => o.poll_votes.map((v) => v.profile_id)));
+  return ids.size;
+}
+
 export interface EnqueteComProgresso {
   poll: PollComMeta;
   votaram: number;
@@ -112,13 +125,10 @@ export async function getEnquetesAbertasComProgresso(): Promise<EnqueteComProgre
   const abertas = (await getEnquetes()).filter((p) => p.status === "aberta");
   return Promise.all(
     abertas.map(async (poll) => {
-      const [elegiveis, detalhe] = await Promise.all([
+      const [elegiveis, votaram] = await Promise.all([
         getMembrosElegiveis(poll),
-        getEnquetePorId(poll.id),
+        contarVotantesUnicos(poll.id),
       ]);
-      const votaram = new Set(
-        (detalhe?.poll_options ?? []).flatMap((o) => o.poll_votes.map((v) => v.profile_id)),
-      ).size;
       return { poll, votaram, esperados: elegiveis.length };
     }),
   );

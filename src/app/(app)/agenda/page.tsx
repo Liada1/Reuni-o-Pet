@@ -13,6 +13,7 @@ import {
   format,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { toZonedTime } from "date-fns-tz";
 import { getCurrentProfile } from "@/features/auth";
 import { getProgramaSettings } from "@/features/configuracoes";
 import { getReunioes } from "@/features/agenda";
@@ -38,7 +39,11 @@ export default async function AgendaPage({
 
   const [perfil, programa] = await Promise.all([getCurrentProfile(), getProgramaSettings()]);
   const coordenacao = isCoordenacao(perfil);
-  const ancora = dataParam ? new Date(`${dataParam}T00:00:00`) : agora();
+  // "hoje" precisa refletir o fuso do grupo, não o do servidor (ex: Vercel
+  // roda em UTC, mas o grupo pode estar em America/Fortaleza) — senão o mês
+  // corrente e o destaque de "hoje" ficam errados perto da meia-noite.
+  const hoje = toZonedTime(agora(), programa.fuso_horario);
+  const ancora = dataParam ? new Date(`${dataParam}T00:00:00`) : hoje;
 
   const mesAncora = startOfMonth(ancora);
   const inicioGrade = startOfWeek(mesAncora, { weekStartsOn: 1 });
@@ -73,6 +78,7 @@ export default async function AgendaPage({
           <MesGrid
             dias={diasDoMes}
             mesAncora={mesAncora}
+            hoje={hoje}
             reunioes={reunioes}
             fusoHorario={programa.fuso_horario}
           />

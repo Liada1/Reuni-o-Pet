@@ -108,6 +108,16 @@ export async function votar(
 
   const supabase = await createClient();
 
+  const { data: poll } = await supabase
+    .from("polls")
+    .select("status")
+    .eq("id", pollId)
+    .maybeSingle();
+  if (!poll) throw new Error("Enquete não encontrada.");
+  if (poll.status !== "aberta") {
+    throw new Error("Esta enquete já foi encerrada e não aceita mais votos.");
+  }
+
   const { data: opcoesDaEnquete } = await supabase
     .from("poll_options")
     .select("id")
@@ -156,8 +166,24 @@ export async function confirmarData(pollId: string, optionId: string) {
     .from("poll_options")
     .select("*")
     .eq("id", optionId)
-    .single();
-  if (!opcao) throw new Error("Opção não encontrada.");
+    .eq("poll_id", pollId)
+    .maybeSingle();
+  if (!opcao) throw new Error("Opção não encontrada para esta enquete.");
+
+  // Trava otimista: só avança se a enquete ainda estiver aberta. Evita que
+  // duas confirmações simultâneas (duas abas, duas pessoas da coordenação)
+  // criem duas reuniões para a mesma enquete.
+  const { data: travada, error: erroTrava } = await supabase
+    .from("polls")
+    .update({ status: "confirmada", confirmed_option_id: optionId })
+    .eq("id", pollId)
+    .eq("status", "aberta")
+    .select("id")
+    .maybeSingle();
+  if (erroTrava) throw new Error(erroTrava.message);
+  if (!travada) {
+    throw new Error("Esta enquete já foi confirmada ou fechada por outra pessoa.");
+  }
 
   const inicio = new Date(opcao.inicio);
   const fim = new Date(inicio.getTime() + poll.duracao_minutos * 60_000);
@@ -182,11 +208,7 @@ export async function confirmarData(pollId: string, optionId: string) {
 
   const { error: erroPoll } = await supabase
     .from("polls")
-    .update({
-      status: "confirmada",
-      confirmed_option_id: optionId,
-      meeting_id: meeting.id,
-    })
+    .update({ meeting_id: meeting.id })
     .eq("id", pollId);
   if (erroPoll) throw new Error(erroPoll.message);
 

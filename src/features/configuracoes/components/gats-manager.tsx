@@ -19,11 +19,8 @@ export function GatsManager({ inicial }: { inicial: Gat[] }) {
     const nome = novoNome.trim();
     if (!nome) return;
     startTransition(async () => {
-      await criarGat(nome);
-      setGats((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), nome, ativo: true } as Gat,
-      ]);
+      const criado = await criarGat(nome);
+      setGats((prev) => [...prev, criado]);
       setNovoNome("");
     });
   }
