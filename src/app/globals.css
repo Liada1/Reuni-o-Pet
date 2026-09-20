@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-paper: #f6f3ec;
+  --color-surface: #ffffff;
+  --color-border: #e2ddd1;
+  --color-ink: #1e2a2f;
+  --color-ink-muted: #5b6468;
+
+  --color-primary: #2f6b4f;
+  --color-primary-hover: #245640;
+  --color-accent: #d9a441;
+  --color-alert: #b5462f;
+
+  --color-type-gat: #3d6e8f;
+  --color-type-area: #2f6b4f;
+  --color-type-estudos: #7a5c99;
+  --color-type-externa: #a0643a;
+  --color-type-formacao: #8a7a2e;
+}
+
+.dark {
+  --color-paper: #161c1f;
+  --color-surface: #1f272b;
+  --color-border: #313b40;
+  --color-ink: #e9e5dc;
+  --color-ink-muted: #9aa3a7;
+
+  --color-primary: #4a9070;
+  --color-primary-hover: #5ca882;
+  --color-accent: #e0b565;
+  --color-alert: #d97557;
+}
+
+@theme inline {
+  --color-paper: var(--color-paper);
+  --color-surface: var(--color-surface);
+  --color-border: var(--color-border);
+  --color-ink: var(--color-ink);
+  --color-ink-muted: var(--color-ink-muted);
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-accent: var(--color-accent);
+  --color-alert: var(--color-alert);
+
+  --color-type-gat: var(--color-type-gat);
+  --color-type-area: var(--color-type-area);
+  --color-type-estudos: var(--color-type-estudos);
+  --color-type-externa: var(--color-type-externa);
+  --color-type-formacao: var(--color-type-formacao);
+
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+
+  --radius-control: 6px;
+  --radius-panel: 8px;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* Linhas finas de "pauta de caderno", usadas com moderação no editor de ata. */
+.pauta-linhas {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 27px,
+    var(--color-border) 27px,
+    var(--color-border) 28px
+  );
+}
+
+/* "Carimbo" de status da ata. */
+.carimbo {
+  display: inline-block;
+  border: 1.5px dashed currentColor;
+  border-radius: 4px;
+  padding: 0.15rem 0.6rem;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
