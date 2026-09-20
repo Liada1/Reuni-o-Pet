@@ -49,3 +49,9 @@ export async function getMeetingTypes() {
     .order("nome");
   return data ?? [];
 }
+
+export async function getLocations() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("locations").select("*").order("nome");
+  return data ?? [];
+}

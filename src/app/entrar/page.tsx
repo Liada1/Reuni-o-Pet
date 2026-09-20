@@ -4,9 +4,9 @@ import { getProgramaSettings } from "@/features/configuracoes";
 export default async function EntrarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ erro?: string }>;
+  searchParams: Promise<{ erro?: string; redirect?: string }>;
 }) {
-  const { erro } = await searchParams;
+  const { erro, redirect } = await searchParams;
   const programa = await getProgramaSettings();
 
   return (
@@ -21,7 +21,7 @@ export default async function EntrarPage({
           )}
         </div>
         <div className="rounded-[var(--radius-panel)] border border-border bg-surface p-6">
-          <EntrarForm erroInicial={erro} />
+          <EntrarForm erroInicial={erro} next={redirect} />
         </div>
       </div>
     </div>

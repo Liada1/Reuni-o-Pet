@@ -10,16 +10,18 @@ import {
   ConvitesAtivosLista,
 } from "@/features/membros";
 import { isCoordenacao } from "@/lib/permissions";
+import { getOrigin } from "@/lib/origin";
 
 export default async function MembrosPage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");
 
-  const [membros, gats, convites, programa] = await Promise.all([
+  const [membros, gats, convites, programa, origin] = await Promise.all([
     getMembros(),
     getGats(),
     getConvitesAtivos(),
     getProgramaSettings(),
+    getOrigin(),
   ]);
   const gatsAtivos = gats.filter((g) => g.ativo);
 
@@ -42,7 +44,7 @@ export default async function MembrosPage() {
           nomePrograma={programa.nome_programa}
           nomeGrupo={programa.nome_grupo}
         />
-        <ConvitesAtivosLista convites={convites} />
+        <ConvitesAtivosLista convites={convites} origin={origin} />
       </section>
 
       <section className="space-y-3">

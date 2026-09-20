@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { BotaoCopiar } from "@/components/ui/botao-copiar";
 import { revogarConvite } from "../actions";
+import { agora } from "@/lib/dates";
 import type { ConviteComGat } from "../types";
 import type { ProfileRole } from "@/lib/supabase/types";
 
@@ -13,7 +14,13 @@ const NOMES_PAPEL: Record<ProfileRole, string> = {
   relator: "Relator(a)",
 };
 
-export function ConvitesAtivosLista({ convites }: { convites: ConviteComGat[] }) {
+export function ConvitesAtivosLista({
+  convites,
+  origin,
+}: {
+  convites: ConviteComGat[];
+  origin: string;
+}) {
   const [pending, startTransition] = useTransition();
 
   if (convites.length === 0) return null;
@@ -21,11 +28,8 @@ export function ConvitesAtivosLista({ convites }: { convites: ConviteComGat[] })
   return (
     <ul className="space-y-2">
       {convites.map((c) => {
-        const link =
-          typeof window !== "undefined"
-            ? `${window.location.origin}/convite/${c.code}`
-            : `/convite/${c.code}`;
-        const expirado = c.expires_at ? new Date(c.expires_at) < new Date() : false;
+        const link = `${origin}/convite/${c.code}`;
+        const expirado = c.expires_at ? new Date(c.expires_at) < agora() : false;
 
         return (
           <li

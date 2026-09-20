@@ -3,6 +3,7 @@ export {
   getPerfisNomes,
   getGats,
   getMeetingTypes,
+  getLocations,
 } from "./queries";
 export {
   atualizarPrograma,
@@ -13,6 +14,9 @@ export {
   criarTipoEncontro,
   atualizarTipoEncontro,
   alternarAtivoTipoEncontro,
+  criarLocal,
+  atualizarLocal,
+  alternarAtivoLocal,
 } from "./actions";
 export type {
   ProgramaSettings,
@@ -24,3 +28,4 @@ export { ProgramaForm } from "./components/programa-form";
 export { PerfisNomesForm } from "./components/perfis-nomes-form";
 export { GatsManager } from "./components/gats-manager";
 export { TiposEncontroManager } from "./components/tipos-encontro-manager";
+export { LocationsManager } from "./components/locations-manager";

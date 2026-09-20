@@ -90,3 +90,30 @@ export async function alternarAtivoTipoEncontro(id: string, ativo: boolean) {
   if (error) throw new Error(error.message);
   revalidatePath("/configuracoes");
 }
+
+export async function criarLocal(dados: { nome: string; endereco?: string }) {
+  await exigirCoordenacao();
+  const supabase = await createClient();
+  const { error } = await supabase.from("locations").insert(dados);
+  if (error) throw new Error(error.message);
+  revalidatePath("/configuracoes");
+}
+
+export async function atualizarLocal(
+  id: string,
+  dados: Partial<{ nome: string; endereco: string | null }>,
+) {
+  await exigirCoordenacao();
+  const supabase = await createClient();
+  const { error } = await supabase.from("locations").update(dados).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/configuracoes");
+}
+
+export async function alternarAtivoLocal(id: string, ativo: boolean) {
+  await exigirCoordenacao();
+  const supabase = await createClient();
+  const { error } = await supabase.from("locations").update({ ativo }).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/configuracoes");
+}

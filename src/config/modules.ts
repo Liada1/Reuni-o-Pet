@@ -41,7 +41,7 @@ export const modules: ModuleConfig[] = [
     rota: "/enquetes",
     icone: ListChecks,
     perfis: ["coordenacao", "participante", "relator"],
-    ativo: false,
+    ativo: true,
   },
   {
     chave: "agenda",
@@ -49,7 +49,7 @@ export const modules: ModuleConfig[] = [
     rota: "/agenda",
     icone: CalendarDays,
     perfis: ["coordenacao", "participante", "relator"],
-    ativo: false,
+    ativo: true,
   },
   {
     chave: "atas",

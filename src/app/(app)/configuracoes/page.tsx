@@ -5,10 +5,12 @@ import {
   getPerfisNomes,
   getGats,
   getMeetingTypes,
+  getLocations,
   ProgramaForm,
   PerfisNomesForm,
   GatsManager,
   TiposEncontroManager,
+  LocationsManager,
 } from "@/features/configuracoes";
 import { isCoordenacao } from "@/lib/permissions";
 
@@ -16,11 +18,12 @@ export default async function ConfiguracoesPage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");
 
-  const [programa, perfisNomes, gats, tiposEncontro] = await Promise.all([
+  const [programa, perfisNomes, gats, tiposEncontro, locais] = await Promise.all([
     getProgramaSettings(),
     getPerfisNomes(),
     getGats(),
     getMeetingTypes(),
+    getLocations(),
   ]);
 
   return (
@@ -51,6 +54,13 @@ export default async function ConfiguracoesPage() {
           Tipos de encontro
         </h2>
         <TiposEncontroManager inicial={tiposEncontro} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+          Locais frequentes
+        </h2>
+        <LocationsManager inicial={locais} />
       </section>
 
       <section className="space-y-3">

@@ -9,7 +9,13 @@ import { Surface } from "@/components/ui/surface";
 import { enviarLinkMagico, entrarComGoogle } from "../actions";
 import { GoogleIcon } from "./google-icon";
 
-export function EntrarForm({ erroInicial }: { erroInicial?: string }) {
+export function EntrarForm({
+  erroInicial,
+  next,
+}: {
+  erroInicial?: string;
+  next?: string;
+}) {
   const [email, setEmail] = useState("");
   const [erro, setErro] = useState<string | null>(mensagemErro(erroInicial));
   const [enviado, setEnviado] = useState(false);
@@ -19,7 +25,7 @@ export function EntrarForm({ erroInicial }: { erroInicial?: string }) {
     if (!email) return;
     setErro(null);
     startTransition(async () => {
-      const { erro } = await enviarLinkMagico(email, { next: "/" });
+      const { erro } = await enviarLinkMagico(email, { next: next || "/" });
       if (erro) setErro(erro);
       else setEnviado(true);
     });
@@ -28,7 +34,7 @@ export function EntrarForm({ erroInicial }: { erroInicial?: string }) {
   function entrarGoogle() {
     setErro(null);
     startTransition(async () => {
-      const { erro, url } = await entrarComGoogle({ next: "/" });
+      const { erro, url } = await entrarComGoogle({ next: next || "/" });
       if (erro || !url) setErro(erro);
       else window.location.href = url;
     });
