@@ -1,11 +1,22 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MapPin, Video } from "lucide-react";
+import { MapPin, Video, PlayCircle, FileText } from "lucide-react";
 import { getCurrentProfile } from "@/features/auth";
 import { getProgramaSettings } from "@/features/configuracoes";
 import { getReuniao } from "@/features/agenda";
+import { getMembros } from "@/features/membros";
 import { ReuniaoAcoes } from "@/features/agenda/components/reuniao-acoes";
+import {
+  getPauta,
+  getMinutePorMeeting,
+  getEncaminhamentosAbertosPorTipo,
+  podeEditarAta,
+} from "@/features/atas";
+import { Pauta } from "@/features/atas/components/pauta";
+import { RelatorPicker } from "@/features/atas/components/relator-picker";
 import { Carimbo } from "@/components/ui/carimbo";
 import { Button } from "@/components/ui/button";
+import { Surface } from "@/components/ui/surface";
 import { formatarDiaSemana, formatarData, formatarHora } from "@/lib/dates";
 import { icsParaDataUri, linkGoogleAgenda } from "@/lib/ics";
 import { isCoordenacao } from "@/lib/permissions";
@@ -18,18 +29,32 @@ const STATUS_TEXTO: Record<string, string> = {
   remarcada: "Remarcada",
 };
 
+const STATUS_ATA_TEXTO: Record<string, string> = {
+  rascunho: "Rascunho",
+  em_revisao: "Em revisão",
+  aprovada: "Aprovada",
+};
+
 export default async function ReuniaoPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [perfil, reuniao, programa] = await Promise.all([
+  const [perfil, reuniao, programa, edita] = await Promise.all([
     getCurrentProfile(),
     getReuniao(id),
     getProgramaSettings(),
+    podeEditarAta(id),
   ]);
   if (!reuniao) notFound();
+
+  const [pauta, minute, encaminhamentosParaRetomar, membros] = await Promise.all([
+    getPauta(id),
+    getMinutePorMeeting(id),
+    getEncaminhamentosAbertosPorTipo(reuniao.meeting_type_id),
+    getMembros(),
+  ]);
 
   const fuso = programa.fuso_horario;
   const local = reuniao.modalidade === "presencial" ? reuniao.locations?.nome ?? "Local a definir" : "Online";
@@ -40,9 +65,14 @@ export default async function ReuniaoPage({
     fimUtc: reuniao.fim_previsto,
     local,
   };
+  const membrosAtivos = membros
+    .filter((m) => m.status === "ativo")
+    .map((m) => ({ id: m.id, nome_exibicao: m.nome_exibicao }));
+
+  const mostrarAta = minute && (minute.status !== "rascunho" || edita);
 
   return (
-    <div className="mx-auto max-w-xl space-y-5 px-4 py-8">
+    <div className="mx-auto max-w-xl space-y-6 px-4 py-8">
       <div>
         <div className="flex items-center gap-2">
           <span
@@ -88,6 +118,52 @@ export default async function ReuniaoPage({
       </div>
 
       {isCoordenacao(perfil) && <ReuniaoAcoes reuniao={reuniao} fusoHorario={fuso} />}
+
+      {reuniao.status !== "cancelada" && (
+        <Surface className="space-y-3 p-4">
+          {isCoordenacao(perfil) && (
+            <RelatorPicker meetingId={id} relatorId={reuniao.relator_id} membros={membrosAtivos} />
+          )}
+          <div className="flex flex-wrap gap-2">
+            {edita && !minute && (
+              <Link href={`/reunioes/${id}/ao-vivo`}>
+                <Button type="button">
+                  <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
+                  Iniciar reunião
+                </Button>
+              </Link>
+            )}
+            {edita && minute && !reuniao.fim_real && (
+              <Link href={`/reunioes/${id}/ao-vivo`}>
+                <Button type="button">
+                  <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
+                  Continuar reunião
+                </Button>
+              </Link>
+            )}
+            {mostrarAta && (
+              <Link href={`/reunioes/${id}/ata`}>
+                <Button type="button" variant="secundario">
+                  <FileText className="h-4 w-4" strokeWidth={1.75} />
+                  Ver ata
+                  <Carimbo texto={STATUS_ATA_TEXTO[minute!.status]} className="ml-1" />
+                </Button>
+              </Link>
+            )}
+          </div>
+        </Surface>
+      )}
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">Pauta</h2>
+        <Pauta
+          meetingId={id}
+          itens={pauta}
+          podeEditar={edita}
+          meuId={perfil!.id}
+          encaminhamentosParaRetomar={encaminhamentosParaRetomar}
+        />
+      </section>
     </div>
   );
 }

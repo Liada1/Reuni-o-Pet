@@ -32,6 +32,13 @@ export function formatarData(utcISO: string, fusoHorario: string) {
   return formatInTimeZone(utcISO, fusoHorario, "dd/MM/yyyy");
 }
 
+/** dd/mm/aaaa para colunas `date` (yyyy-MM-dd), que não têm fuso: converter
+ * por timezone deslocaria o dia (meia-noite UTC vira o dia anterior aqui). */
+export function formatarDataSimples(dataISO: string) {
+  const [ano, mes, dia] = dataISO.slice(0, 10).split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+
 /** dd/mm curto, com mês por extenso abreviado quando útil */
 export function formatarDataCurta(utcISO: string, fusoHorario: string) {
   const local = toZonedTime(utcISO, fusoHorario);

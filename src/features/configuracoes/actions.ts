@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/features/auth";
 import { isCoordenacao } from "@/lib/permissions";
-import type { ProgramaSettings, PerfisNomesSettings } from "./types";
+import type { ProgramaSettings, PerfisNomesSettings, AtaPdfSettings } from "./types";
 
 async function exigirCoordenacao() {
   const perfil = await getCurrentProfile();
@@ -31,6 +31,10 @@ export async function atualizarPrograma(dados: ProgramaSettings) {
 
 export async function atualizarPerfisNomes(dados: PerfisNomesSettings) {
   await salvarSetting("perfis_nomes", dados as unknown as Record<string, unknown>);
+}
+
+export async function atualizarAtaPdfSettings(dados: AtaPdfSettings) {
+  await salvarSetting("ata_pdf", dados as unknown as Record<string, unknown>);
 }
 
 export async function criarGat(nome: string) {

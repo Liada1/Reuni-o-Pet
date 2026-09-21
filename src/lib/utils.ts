@@ -1,7 +1,11 @@
 import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
+/** Junta classes resolvendo conflitos do Tailwind: a classe passada por
+ * quem usa o componente vence a do componente base (ex: `w-auto` sobre o
+ * `w-full` padrão do Select). */
 export function cn(...inputs: ClassValue[]) {
-  return clsx(inputs);
+  return twMerge(clsx(inputs));
 }
 
 export function iniciais(nome: string) {

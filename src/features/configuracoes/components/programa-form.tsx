@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { atualizarPrograma } from "../actions";
+import { LogoUpload } from "./logo-upload";
 import type { ProgramaSettings } from "../types";
 
 const FUSOS = [
@@ -62,6 +63,18 @@ export function ProgramaForm({ inicial }: { inicial: ProgramaSettings }) {
             </option>
           ))}
         </Select>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <LogoUpload
+          label="Logo do PET"
+          urlAtual={dados.logo_pet_url}
+          onChange={(url) => setDados({ ...dados, logo_pet_url: url })}
+        />
+        <LogoUpload
+          label="Logo da instituição"
+          urlAtual={dados.logo_instituicao_url}
+          onChange={(url) => setDados({ ...dados, logo_instituicao_url: url })}
+        />
       </div>
       <div className="flex items-center gap-3">
         <Button type="button" onClick={salvar} disabled={pending}>

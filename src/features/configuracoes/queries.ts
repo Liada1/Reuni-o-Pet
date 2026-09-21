@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { ProgramaSettings, PerfisNomesSettings } from "./types";
+import type { ProgramaSettings, PerfisNomesSettings, AtaPdfSettings } from "./types";
 
 const PROGRAMA_PADRAO: ProgramaSettings = {
   nome_programa: "PET",
@@ -33,6 +33,18 @@ export async function getPerfisNomes(): Promise<PerfisNomesSettings> {
     .eq("key", "perfis_nomes")
     .maybeSingle();
   return { ...PERFIS_NOMES_PADRAO, ...(data?.value as Partial<PerfisNomesSettings>) };
+}
+
+const ATA_PDF_PADRAO: AtaPdfSettings = { coluna_assinatura: false };
+
+export async function getAtaPdfSettings(): Promise<AtaPdfSettings> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("settings")
+    .select("value")
+    .eq("key", "ata_pdf")
+    .maybeSingle();
+  return { ...ATA_PDF_PADRAO, ...(data?.value as Partial<AtaPdfSettings>) };
 }
 
 export async function getGats() {

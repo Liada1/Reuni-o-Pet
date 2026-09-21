@@ -3,6 +3,7 @@ import { getCurrentProfile } from "@/features/auth";
 import {
   getProgramaSettings,
   getPerfisNomes,
+  getAtaPdfSettings,
   getGats,
   getMeetingTypes,
   getLocations,
@@ -11,6 +12,7 @@ import {
   GatsManager,
   TiposEncontroManager,
   LocationsManager,
+  AtaPdfForm,
 } from "@/features/configuracoes";
 import { isCoordenacao } from "@/lib/permissions";
 
@@ -18,12 +20,13 @@ export default async function ConfiguracoesPage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");
 
-  const [programa, perfisNomes, gats, tiposEncontro, locais] = await Promise.all([
+  const [programa, perfisNomes, gats, tiposEncontro, locais, ataPdf] = await Promise.all([
     getProgramaSettings(),
     getPerfisNomes(),
     getGats(),
     getMeetingTypes(),
     getLocations(),
+    getAtaPdfSettings(),
   ]);
 
   return (
@@ -68,6 +71,13 @@ export default async function ConfiguracoesPage() {
           Nomes dos perfis
         </h2>
         <PerfisNomesForm inicial={perfisNomes} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+          PDF da ata
+        </h2>
+        <AtaPdfForm inicial={ataPdf} />
       </section>
     </div>
   );

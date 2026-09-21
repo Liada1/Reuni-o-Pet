@@ -10,6 +10,10 @@ export type MeetingStatus =
   | "realizada"
   | "cancelada"
   | "remarcada";
+export type MinuteStatus = "rascunho" | "em_revisao" | "aprovada";
+export type AttendanceStatus = "presente" | "ausente" | "justificado";
+export type NoteTipo = "nota" | "decisao" | "encaminhamento" | "duvida";
+export type ActionItemStatus = "pendente" | "em_andamento" | "concluido";
 
 export interface Database {
   public: {
@@ -196,6 +200,7 @@ export interface Database {
           status: MeetingStatus;
           poll_id: string | null;
           motivo_remarcacao_cancelamento: string | null;
+          relator_id: string | null;
           created_by: string | null;
           created_at: string;
           updated_at: string;
@@ -214,6 +219,7 @@ export interface Database {
           status?: MeetingStatus;
           poll_id?: string | null;
           motivo_remarcacao_cancelamento?: string | null;
+          relator_id?: string | null;
           created_by?: string | null;
         };
         Update: {
@@ -227,6 +233,7 @@ export interface Database {
           link_online?: string | null;
           status?: MeetingStatus;
           motivo_remarcacao_cancelamento?: string | null;
+          relator_id?: string | null;
         };
         Relationships: [];
       };
@@ -339,8 +346,203 @@ export interface Database {
         Update: Record<string, never>;
         Relationships: [];
       };
+      agenda_items: {
+        Row: {
+          id: string;
+          meeting_id: string;
+          titulo: string;
+          ordem: number;
+          sugerido_por: string | null;
+          aceito: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          meeting_id: string;
+          titulo: string;
+          ordem?: number;
+          sugerido_por?: string | null;
+          aceito?: boolean;
+        };
+        Update: {
+          titulo?: string;
+          ordem?: number;
+          aceito?: boolean;
+        };
+        Relationships: [];
+      };
+      attendance: {
+        Row: {
+          id: string;
+          meeting_id: string;
+          profile_id: string | null;
+          visitante_nome: string | null;
+          visitante_instituicao: string | null;
+          status: AttendanceStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          meeting_id: string;
+          profile_id?: string | null;
+          visitante_nome?: string | null;
+          visitante_instituicao?: string | null;
+          status?: AttendanceStatus;
+        };
+        Update: {
+          status?: AttendanceStatus;
+        };
+        Relationships: [];
+      };
+      minutes: {
+        Row: {
+          id: string;
+          meeting_id: string;
+          status: MinuteStatus;
+          relato: Record<string, string>;
+          proxima_reuniao_id: string | null;
+          reporter_id: string | null;
+          aprovada_por: string | null;
+          aprovada_em: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          meeting_id: string;
+          status?: MinuteStatus;
+          relato?: Record<string, string>;
+          proxima_reuniao_id?: string | null;
+          reporter_id?: string | null;
+        };
+        Update: {
+          status?: MinuteStatus;
+          relato?: Record<string, string>;
+          proxima_reuniao_id?: string | null;
+          aprovada_por?: string | null;
+          aprovada_em?: string | null;
+        };
+        Relationships: [];
+      };
+      action_items: {
+        Row: {
+          id: string;
+          minutes_id: string;
+          descricao: string;
+          responsavel_id: string | null;
+          prazo: string | null;
+          status: ActionItemStatus;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          minutes_id: string;
+          descricao: string;
+          responsavel_id?: string | null;
+          prazo?: string | null;
+          status?: ActionItemStatus;
+        };
+        Update: {
+          descricao?: string;
+          responsavel_id?: string | null;
+          prazo?: string | null;
+          status?: ActionItemStatus;
+        };
+        Relationships: [];
+      };
+      minute_notes: {
+        Row: {
+          id: string;
+          minutes_id: string;
+          agenda_item_id: string | null;
+          autor_id: string | null;
+          texto: string;
+          tipo: NoteTipo;
+          action_item_id: string | null;
+          hora: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          minutes_id: string;
+          agenda_item_id?: string | null;
+          autor_id?: string | null;
+          texto: string;
+          tipo?: NoteTipo;
+          action_item_id?: string | null;
+          hora?: string;
+        };
+        Update: {
+          texto?: string;
+          tipo?: NoteTipo;
+          action_item_id?: string | null;
+        };
+        Relationships: [];
+      };
+      minute_comments: {
+        Row: {
+          id: string;
+          minutes_id: string;
+          profile_id: string;
+          texto: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          minutes_id: string;
+          profile_id: string;
+          texto: string;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      minute_pdfs: {
+        Row: {
+          id: string;
+          minutes_id: string;
+          versao: number;
+          storage_path: string;
+          gerado_por: string | null;
+          gerado_em: string;
+        };
+        Insert: {
+          id?: string;
+          minutes_id: string;
+          versao: number;
+          storage_path: string;
+          gerado_por?: string | null;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      attachments: {
+        Row: {
+          id: string;
+          minutes_id: string;
+          storage_path: string;
+          nome: string | null;
+          uploaded_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          minutes_id: string;
+          storage_path: string;
+          nome?: string | null;
+          uploaded_by?: string | null;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      merge_relato: {
+        Args: { p_minutes_id: string; p_chave: string; p_texto: string };
+        Returns: void;
+      };
+    };
   };
 }

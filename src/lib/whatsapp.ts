@@ -1,3 +1,5 @@
+import { formatarDataSimples } from "@/lib/dates";
+
 export function linkWhatsApp(texto: string) {
   return `https://wa.me/?text=${encodeURIComponent(texto)}`;
 }
@@ -35,6 +37,27 @@ export function mensagemConfirmacao(params: {
   link: string;
 }) {
   return `✅ Reunião confirmada: ${params.tituloReuniao}\n${params.dataHoraFormatada} · ${params.local}\nAdicione à sua agenda: ${params.link}`;
+}
+
+export function mensagemResumoAta(params: {
+  tituloReuniao: string;
+  decisoes: string[];
+  encaminhamentos: { descricao: string; responsavel: string | null; prazo: string | null }[];
+}) {
+  const linhasDecisoes =
+    params.decisoes.length > 0
+      ? params.decisoes.map((d) => `- ${d}`).join("\n")
+      : "Nenhuma decisão registrada.";
+  const linhasEncaminhamentos =
+    params.encaminhamentos.length > 0
+      ? params.encaminhamentos
+          .map(
+            (e) =>
+              `- ${e.descricao}${e.responsavel ? ` (${e.responsavel})` : ""}${e.prazo ? ` — prazo ${formatarDataSimples(e.prazo)}` : ""}`,
+          )
+          .join("\n")
+      : "Nenhum encaminhamento registrado.";
+  return `📝 Resumo da ata — ${params.tituloReuniao}\n\n*Decisões:*\n${linhasDecisoes}\n\n*Encaminhamentos:*\n${linhasEncaminhamentos}`;
 }
 
 export function mensagemRemarcacaoCancelamento(params: {

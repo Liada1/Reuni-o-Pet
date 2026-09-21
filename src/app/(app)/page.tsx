@@ -1,13 +1,22 @@
 import Link from "next/link";
-import { UserCheck, ListChecks, CalendarDays } from "lucide-react";
+import { UserCheck, ListChecks, CalendarDays, FileText, ClipboardList } from "lucide-react";
 import { getCurrentProfile } from "@/features/auth";
 import { contarPendentes } from "@/features/membros";
 import { getEnquetes, getEnquetesAbertasComProgresso, jaVotou } from "@/features/enquetes";
 import { getProximaReuniao } from "@/features/agenda";
+import { getAtas, getEncaminhamentos } from "@/features/atas";
 import { getProgramaSettings } from "@/features/configuracoes";
+import { Carimbo } from "@/components/ui/carimbo";
 import { isCoordenacao } from "@/lib/permissions";
 import { Surface } from "@/components/ui/surface";
-import { formatarDiaSemana, formatarData, formatarHora } from "@/lib/dates";
+import { formatarDiaSemana, formatarData, formatarDataSimples, formatarHora } from "@/lib/dates";
+import type { MinuteStatus } from "@/lib/supabase/types";
+
+const STATUS_ATA_TEXTO: Record<MinuteStatus, string> = {
+  rascunho: "Rascunho",
+  em_revisao: "Em revisão",
+  aprovada: "Aprovada",
+};
 
 export default async function PainelPage() {
   const [perfil, programa, proximaReuniao] = await Promise.all([
@@ -55,13 +64,37 @@ export default async function PainelPage() {
 }
 
 async function PainelCoordenacao() {
-  const [pendentes, enquetes] = await Promise.all([
+  const [pendentes, enquetes, atasRascunho, atasEmRevisao] = await Promise.all([
     contarPendentes(),
     getEnquetesAbertasComProgresso(),
+    getAtas({ status: "rascunho" }),
+    getAtas({ status: "em_revisao" }),
   ]);
+  const atasPendentes = [...atasRascunho, ...atasEmRevisao];
 
   return (
     <div className="space-y-3">
+      {atasPendentes.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+            Atas aguardando ação
+          </p>
+          {atasPendentes.map((ata) => (
+            <Link key={ata.id} href={`/reunioes/${ata.meeting_id}/ata`}>
+              <Surface className="flex items-center justify-between gap-3 p-4 transition-colors hover:bg-paper">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-ink-muted" strokeWidth={1.75} />
+                  <p className="text-sm font-medium text-ink">
+                    {ata.meetings?.titulo || ata.meetings?.meeting_types?.nome}
+                  </p>
+                </div>
+                <Carimbo texto={STATUS_ATA_TEXTO[ata.status]} />
+              </Surface>
+            </Link>
+          ))}
+        </div>
+      )}
+
       {pendentes > 0 && (
         <Link href="/membros">
           <Surface className="flex items-center gap-3 p-4 transition-colors hover:bg-paper">
@@ -98,7 +131,7 @@ async function PainelCoordenacao() {
         </div>
       )}
 
-      {pendentes === 0 && enquetes.length === 0 && (
+      {pendentes === 0 && enquetes.length === 0 && atasPendentes.length === 0 && (
         <p className="text-sm text-ink-muted">Nenhuma pendência no momento.</p>
       )}
     </div>
@@ -106,30 +139,77 @@ async function PainelCoordenacao() {
 }
 
 async function PainelParticipante({ perfilId }: { perfilId: string }) {
-  const abertas = (await getEnquetes()).filter((p) => p.status === "aberta");
+  const [abertas, encaminhamentos, ultimaAprovada] = await Promise.all([
+    getEnquetes(),
+    getEncaminhamentos({ responsavelId: perfilId }),
+    getAtas({ status: "aprovada" }),
+  ]);
   const pendentesDeVoto = (
     await Promise.all(
-      abertas.map(async (poll) => ({ poll, votou: await jaVotou(poll.id, perfilId) })),
+      abertas
+        .filter((p) => p.status === "aberta")
+        .map(async (poll) => ({ poll, votou: await jaVotou(poll.id, perfilId) })),
     )
   ).filter((e) => !e.votou);
-
-  if (pendentesDeVoto.length === 0) {
-    return <p className="text-sm text-ink-muted">Nenhuma enquete aguardando seu voto.</p>;
-  }
+  const encaminhamentosPendentes = encaminhamentos.filter((e) => e.status !== "concluido");
+  const ultima = ultimaAprovada[0];
 
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
-        Enquetes aguardando seu voto
-      </p>
-      {pendentesDeVoto.map(({ poll }) => (
-        <Link key={poll.id} href={`/e/${poll.code}`}>
-          <Surface className="flex items-center gap-2 border-accent/40 p-4 transition-colors hover:bg-paper">
-            <ListChecks className="h-4 w-4 text-accent" strokeWidth={1.75} />
-            <p className="text-sm font-medium text-ink">{poll.titulo}</p>
-          </Surface>
-        </Link>
-      ))}
+    <div className="space-y-5">
+      {pendentesDeVoto.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+            Enquetes aguardando seu voto
+          </p>
+          {pendentesDeVoto.map(({ poll }) => (
+            <Link key={poll.id} href={`/e/${poll.code}`}>
+              <Surface className="flex items-center gap-2 border-accent/40 p-4 transition-colors hover:bg-paper">
+                <ListChecks className="h-4 w-4 text-accent" strokeWidth={1.75} />
+                <p className="text-sm font-medium text-ink">{poll.titulo}</p>
+              </Surface>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {encaminhamentosPendentes.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+            Seus encaminhamentos
+          </p>
+          {encaminhamentosPendentes.map((e) => (
+            <Surface key={e.id} className="flex items-center gap-2 p-4">
+              <ClipboardList className="h-4 w-4 text-ink-muted" strokeWidth={1.75} />
+              <div>
+                <p className="text-sm text-ink">{e.descricao}</p>
+                {e.prazo && (
+                  <p className="text-xs text-ink-muted">Prazo: {formatarDataSimples(e.prazo)}</p>
+                )}
+              </div>
+            </Surface>
+          ))}
+        </div>
+      )}
+
+      {ultima && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+            Última ata aprovada
+          </p>
+          <Link href={`/reunioes/${ultima.meeting_id}/ata`}>
+            <Surface className="flex items-center gap-2 p-4 transition-colors hover:bg-paper">
+              <FileText className="h-4 w-4 text-ink-muted" strokeWidth={1.75} />
+              <p className="text-sm text-ink">
+                {ultima.meetings?.titulo || ultima.meetings?.meeting_types?.nome}
+              </p>
+            </Surface>
+          </Link>
+        </div>
+      )}
+
+      {pendentesDeVoto.length === 0 &&
+        encaminhamentosPendentes.length === 0 &&
+        !ultima && <p className="text-sm text-ink-muted">Nada por aqui ainda.</p>}
     </div>
   );
 }

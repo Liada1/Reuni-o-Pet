@@ -8,6 +8,7 @@ import {
   Clock,
   Users,
   Settings,
+  ClipboardList,
 } from "lucide-react";
 import type { ProfileRole } from "@/lib/supabase/types";
 
@@ -57,7 +58,15 @@ export const modules: ModuleConfig[] = [
     rota: "/atas",
     icone: FileText,
     perfis: ["coordenacao", "participante", "relator"],
-    ativo: false,
+    ativo: true,
+  },
+  {
+    chave: "encaminhamentos",
+    nome: "Encaminhamentos",
+    rota: "/encaminhamentos",
+    icone: ClipboardList,
+    perfis: ["coordenacao", "participante", "relator"],
+    ativo: true,
   },
   {
     chave: "formacao",
