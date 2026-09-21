@@ -58,22 +58,89 @@ export default async function PainelPage() {
         </Link>
       )}
 
-      {coordenacao ? <PainelCoordenacao /> : <PainelParticipante perfilId={perfil!.id} />}
+      {coordenacao ? (
+        <PainelCoordenacao perfilId={perfil!.id} />
+      ) : (
+        <PainelParticipante perfilId={perfil!.id} />
+      )}
     </div>
   );
 }
 
-async function PainelCoordenacao() {
-  const [pendentes, enquetes, atasRascunho, atasEmRevisao] = await Promise.all([
+/** Encaminhamentos abertos da pessoa + última ata aprovada: aparece nos
+ * dois painéis, porque quem coordena também recebe encaminhamento. */
+async function getDadosPessoais(perfilId: string) {
+  const [encaminhamentos, aprovadas] = await Promise.all([
+    getEncaminhamentos({ responsavelId: perfilId }),
+    getAtas({ status: "aprovada" }),
+  ]);
+  return {
+    encaminhamentosPendentes: encaminhamentos.filter((e) => e.status !== "concluido"),
+    ultimaAta: aprovadas[0],
+  };
+}
+
+type DadosPessoais = Awaited<ReturnType<typeof getDadosPessoais>>;
+
+function BlocoPessoal({ encaminhamentosPendentes, ultimaAta }: DadosPessoais) {
+  return (
+    <>
+      {encaminhamentosPendentes.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+            Seus encaminhamentos
+          </p>
+          {encaminhamentosPendentes.map((e) => (
+            <Surface key={e.id} className="flex items-center gap-2 p-4">
+              <ClipboardList className="h-4 w-4 text-ink-muted" strokeWidth={1.75} />
+              <div>
+                <p className="text-sm text-ink">{e.descricao}</p>
+                {e.prazo && (
+                  <p className="text-xs text-ink-muted">Prazo: {formatarDataSimples(e.prazo)}</p>
+                )}
+              </div>
+            </Surface>
+          ))}
+        </div>
+      )}
+
+      {ultimaAta && (
+        <div className="space-y-2">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+            Última ata aprovada
+          </p>
+          <Link href={`/reunioes/${ultimaAta.meeting_id}/ata`}>
+            <Surface className="flex items-center gap-2 p-4 transition-colors hover:bg-paper">
+              <FileText className="h-4 w-4 text-ink-muted" strokeWidth={1.75} />
+              <p className="text-sm text-ink">
+                {ultimaAta.meetings?.titulo || ultimaAta.meetings?.meeting_types?.nome}
+              </p>
+            </Surface>
+          </Link>
+        </div>
+      )}
+    </>
+  );
+}
+
+async function PainelCoordenacao({ perfilId }: { perfilId: string }) {
+  const [pendentes, enquetes, atasRascunho, atasEmRevisao, pessoais] = await Promise.all([
     contarPendentes(),
     getEnquetesAbertasComProgresso(),
     getAtas({ status: "rascunho" }),
     getAtas({ status: "em_revisao" }),
+    getDadosPessoais(perfilId),
   ]);
   const atasPendentes = [...atasRascunho, ...atasEmRevisao];
+  const semNada =
+    pendentes === 0 &&
+    enquetes.length === 0 &&
+    atasPendentes.length === 0 &&
+    pessoais.encaminhamentosPendentes.length === 0 &&
+    !pessoais.ultimaAta;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       {atasPendentes.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
@@ -131,19 +198,15 @@ async function PainelCoordenacao() {
         </div>
       )}
 
-      {pendentes === 0 && enquetes.length === 0 && atasPendentes.length === 0 && (
-        <p className="text-sm text-ink-muted">Nenhuma pendência no momento.</p>
-      )}
+      <BlocoPessoal {...pessoais} />
+
+      {semNada && <p className="text-sm text-ink-muted">Nenhuma pendência no momento.</p>}
     </div>
   );
 }
 
 async function PainelParticipante({ perfilId }: { perfilId: string }) {
-  const [abertas, encaminhamentos, ultimaAprovada] = await Promise.all([
-    getEnquetes(),
-    getEncaminhamentos({ responsavelId: perfilId }),
-    getAtas({ status: "aprovada" }),
-  ]);
+  const [abertas, pessoais] = await Promise.all([getEnquetes(), getDadosPessoais(perfilId)]);
   const pendentesDeVoto = (
     await Promise.all(
       abertas
@@ -151,8 +214,6 @@ async function PainelParticipante({ perfilId }: { perfilId: string }) {
         .map(async (poll) => ({ poll, votou: await jaVotou(poll.id, perfilId) })),
     )
   ).filter((e) => !e.votou);
-  const encaminhamentosPendentes = encaminhamentos.filter((e) => e.status !== "concluido");
-  const ultima = ultimaAprovada[0];
 
   return (
     <div className="space-y-5">
@@ -172,44 +233,11 @@ async function PainelParticipante({ perfilId }: { perfilId: string }) {
         </div>
       )}
 
-      {encaminhamentosPendentes.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
-            Seus encaminhamentos
-          </p>
-          {encaminhamentosPendentes.map((e) => (
-            <Surface key={e.id} className="flex items-center gap-2 p-4">
-              <ClipboardList className="h-4 w-4 text-ink-muted" strokeWidth={1.75} />
-              <div>
-                <p className="text-sm text-ink">{e.descricao}</p>
-                {e.prazo && (
-                  <p className="text-xs text-ink-muted">Prazo: {formatarDataSimples(e.prazo)}</p>
-                )}
-              </div>
-            </Surface>
-          ))}
-        </div>
-      )}
-
-      {ultima && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
-            Última ata aprovada
-          </p>
-          <Link href={`/reunioes/${ultima.meeting_id}/ata`}>
-            <Surface className="flex items-center gap-2 p-4 transition-colors hover:bg-paper">
-              <FileText className="h-4 w-4 text-ink-muted" strokeWidth={1.75} />
-              <p className="text-sm text-ink">
-                {ultima.meetings?.titulo || ultima.meetings?.meeting_types?.nome}
-              </p>
-            </Surface>
-          </Link>
-        </div>
-      )}
+      <BlocoPessoal {...pessoais} />
 
       {pendentesDeVoto.length === 0 &&
-        encaminhamentosPendentes.length === 0 &&
-        !ultima && <p className="text-sm text-ink-muted">Nada por aqui ainda.</p>}
+        pessoais.encaminhamentosPendentes.length === 0 &&
+        !pessoais.ultimaAta && <p className="text-sm text-ink-muted">Nada por aqui ainda.</p>}
     </div>
   );
 }
