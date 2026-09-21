@@ -536,6 +536,29 @@ export interface Database {
         Update: Record<string, never>;
         Relationships: [];
       };
+      formacoes: {
+        Row: {
+          id: string;
+          meeting_id: string;
+          tema: string;
+          carga_horaria_minutos: number;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          meeting_id: string;
+          tema: string;
+          carga_horaria_minutos?: number;
+          created_by?: string | null;
+        };
+        Update: {
+          tema?: string;
+          carga_horaria_minutos?: number;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import type { ProgramaSettings, PerfisNomesSettings, AtaPdfSettings } from "./types";
+import type {
+  ProgramaSettings,
+  PerfisNomesSettings,
+  AtaPdfSettings,
+  MetasSettings,
+} from "./types";
 
 const PROGRAMA_PADRAO: ProgramaSettings = {
   nome_programa: "PET",
@@ -45,6 +50,22 @@ export async function getAtaPdfSettings(): Promise<AtaPdfSettings> {
     .eq("key", "ata_pdf")
     .maybeSingle();
   return { ...ATA_PDF_PADRAO, ...(data?.value as Partial<AtaPdfSettings>) };
+}
+
+const METAS_PADRAO: MetasSettings = {
+  encontros_por_semana: 2,
+  horas_por_semana: 8,
+  tipos_obrigatorios_por_mes: [],
+};
+
+export async function getMetasSettings(): Promise<MetasSettings> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("settings")
+    .select("value")
+    .eq("key", "metas")
+    .maybeSingle();
+  return { ...METAS_PADRAO, ...(data?.value as Partial<MetasSettings>) };
 }
 
 export async function getGats() {

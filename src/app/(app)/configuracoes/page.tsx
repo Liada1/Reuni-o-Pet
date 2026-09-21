@@ -4,6 +4,7 @@ import {
   getProgramaSettings,
   getPerfisNomes,
   getAtaPdfSettings,
+  getMetasSettings,
   getGats,
   getMeetingTypes,
   getLocations,
@@ -13,6 +14,7 @@ import {
   TiposEncontroManager,
   LocationsManager,
   AtaPdfForm,
+  MetasForm,
 } from "@/features/configuracoes";
 import { isCoordenacao } from "@/lib/permissions";
 
@@ -20,21 +22,24 @@ export default async function ConfiguracoesPage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");
 
-  const [programa, perfisNomes, gats, tiposEncontro, locais, ataPdf] = await Promise.all([
-    getProgramaSettings(),
-    getPerfisNomes(),
-    getGats(),
-    getMeetingTypes(),
-    getLocations(),
-    getAtaPdfSettings(),
-  ]);
+  const [programa, perfisNomes, gats, tiposEncontro, locais, ataPdf, metas] =
+    await Promise.all([
+      getProgramaSettings(),
+      getPerfisNomes(),
+      getGats(),
+      getMeetingTypes(),
+      getLocations(),
+      getAtaPdfSettings(),
+      getMetasSettings(),
+    ]);
 
   return (
     <div className="mx-auto max-w-3xl space-y-10 px-4 py-8">
       <div>
         <h1 className="font-display text-2xl font-semibold text-ink">Configurações</h1>
         <p className="text-sm text-ink-muted">
-          Ajustes gerais do programa, GATs, tipos de encontro e nomes de perfis.
+          Ajustes gerais do programa, GATs, tipos de encontro, metas e nomes de
+          perfis.
         </p>
       </div>
 
@@ -64,6 +69,13 @@ export default async function ConfiguracoesPage() {
           Locais frequentes
         </h2>
         <LocationsManager inicial={locais} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
+          Metas do grupo
+        </h2>
+        <MetasForm inicial={metas} tiposEncontro={tiposEncontro} />
       </section>
 
       <section className="space-y-3">

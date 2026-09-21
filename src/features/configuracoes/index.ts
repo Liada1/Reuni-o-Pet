@@ -2,6 +2,7 @@ export {
   getProgramaSettings,
   getPerfisNomes,
   getAtaPdfSettings,
+  getMetasSettings,
   getGats,
   getMeetingTypes,
   getLocations,
@@ -10,6 +11,7 @@ export {
   atualizarPrograma,
   atualizarPerfisNomes,
   atualizarAtaPdfSettings,
+  atualizarMetas,
   criarGat,
   renomearGat,
   alternarAtivoGat,
@@ -32,3 +34,4 @@ export { GatsManager } from "./components/gats-manager";
 export { TiposEncontroManager } from "./components/tipos-encontro-manager";
 export { LocationsManager } from "./components/locations-manager";
 export { AtaPdfForm } from "./components/ata-pdf-form";
+export { MetasForm } from "./components/metas-form";

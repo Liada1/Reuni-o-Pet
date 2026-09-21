@@ -9,6 +9,7 @@ import {
   Users,
   Settings,
   ClipboardList,
+  Target,
 } from "lucide-react";
 import type { ProfileRole } from "@/lib/supabase/types";
 
@@ -69,12 +70,20 @@ export const modules: ModuleConfig[] = [
     ativo: true,
   },
   {
+    chave: "planejamento",
+    nome: "Planejamento",
+    rota: "/planejamento",
+    icone: Target,
+    perfis: ["coordenacao", "participante", "relator"],
+    ativo: true,
+  },
+  {
     chave: "formacao",
     nome: "Formação",
     rota: "/formacao",
     icone: GraduationCap,
     perfis: ["coordenacao", "participante", "relator"],
-    ativo: false,
+    ativo: true,
   },
   {
     chave: "frequencia",
@@ -82,7 +91,7 @@ export const modules: ModuleConfig[] = [
     rota: "/frequencia",
     icone: Clock,
     perfis: ["coordenacao", "participante", "relator"],
-    ativo: false,
+    ativo: true,
   },
   {
     chave: "membros",
