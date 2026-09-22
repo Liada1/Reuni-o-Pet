@@ -24,6 +24,7 @@ export function RelatorPicker({
     <div className="flex items-center gap-2">
       <span className="text-sm text-ink-muted">Relator(a) desta reunião:</span>
       <Select
+        aria-label="Relator(a) desta reunião"
         value={relatorId ?? ""}
         disabled={pending}
         onChange={(e) =>

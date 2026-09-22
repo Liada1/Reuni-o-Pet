@@ -11,8 +11,16 @@ const CONFIG: Record<StatusSync, { texto: string; icone: typeof Cloud; cor: stri
 export function IndicadorStatus({ status }: { status: StatusSync }) {
   const { texto, icone: Icone, cor } = CONFIG[status];
   return (
-    <span className={`flex items-center gap-1.5 text-xs font-medium ${cor}`}>
-      <Icone className={`h-3.5 w-3.5 ${status === "salvando" ? "animate-spin" : ""}`} strokeWidth={1.75} />
+    <span
+      role="status"
+      aria-live="polite"
+      className={`flex items-center gap-1.5 text-xs font-medium ${cor}`}
+    >
+      <Icone
+        aria-hidden="true"
+        className={`h-3.5 w-3.5 ${status === "salvando" ? "animate-spin" : ""}`}
+        strokeWidth={1.75}
+      />
       {texto}
     </span>
   );

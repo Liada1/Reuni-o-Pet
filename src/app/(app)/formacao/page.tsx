@@ -14,6 +14,8 @@ import { formatarMinutos } from "@/lib/duracao";
 import { isCoordenacao } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 
+export const metadata = { title: "Formação" };
+
 const NOMES_BIMESTRE = [
   "1º bimestre",
   "2º bimestre",

@@ -70,7 +70,7 @@ export function VotarForm({ poll, fusoHorario, meusVotosIniciais, meuId }: Votar
                 onClick={() => alternar(opcao.id, "pode")}
                 className={`flex-1 rounded-[var(--radius-control)] border px-3 py-2 text-sm font-medium ${
                   meuVoto === "pode"
-                    ? "border-primary bg-primary text-white"
+                    ? "border-primary bg-primary text-on-fill"
                     : "border-border text-ink-muted hover:bg-paper"
                 }`}
               >

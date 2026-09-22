@@ -10,6 +10,8 @@ import {
 import { NovaEnqueteForm } from "@/features/enquetes/components/nova-enquete-form";
 import { isCoordenacao } from "@/lib/permissions";
 
+export const metadata = { title: "Nova enquete" };
+
 export default async function NovaEnquetePage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");

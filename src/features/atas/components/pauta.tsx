@@ -103,12 +103,19 @@ export function Pauta({ meetingId, itens, podeEditar, meuId, encaminhamentosPara
 
       <div className="flex items-center gap-2">
         <Input
+          aria-label={podeEditar ? "Novo tópico da pauta" : "Sugerir tópico para a pauta"}
           placeholder={podeEditar ? "Novo tópico" : "Sugerir tópico"}
           value={novoTitulo}
           onChange={(e) => setNovoTitulo(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && enviar()}
         />
-        <Button type="button" variant="secundario" onClick={enviar} disabled={pending}>
+        <Button
+          type="button"
+          variant="secundario"
+          aria-label={podeEditar ? "Adicionar tópico" : "Sugerir tópico"}
+          onClick={enviar}
+          disabled={pending}
+        >
           <Plus className="h-4 w-4" strokeWidth={1.75} />
         </Button>
       </div>

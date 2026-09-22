@@ -20,7 +20,8 @@ export function Avatar({ nome, fotoUrl, tamanho = "md", className }: AvatarProps
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={fotoUrl}
-        alt={nome}
+        alt=""
+        aria-hidden
         className={cn("rounded-full object-cover", tamanhos[tamanho], className)}
       />
     );

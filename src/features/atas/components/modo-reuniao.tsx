@@ -91,7 +91,7 @@ export function ModoReuniao({
     <div className="flex min-h-svh flex-col pauta-linhas">
       <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-surface px-4 py-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-ink">{meetingTitulo}</p>
+          <h1 className="truncate text-sm font-medium text-ink">{meetingTitulo}</h1>
           <IndicadorStatus status={status} />
         </div>
         <Button type="button" variant="perigo" onClick={abrirEncerramento}>
@@ -105,11 +105,13 @@ export function ModoReuniao({
           <div className="flex flex-wrap items-center gap-2">
             <Input
               type="date"
+              aria-label="Data de término da reunião"
               value={dataEncerramento}
               onChange={(e) => setDataEncerramento(e.target.value)}
             />
             <Input
               type="time"
+              aria-label="Hora de término da reunião"
               value={horaEncerramento}
               onChange={(e) => setHoraEncerramento(e.target.value)}
             />

@@ -61,7 +61,11 @@ export function RegistrarFormacao({
 
   return (
     <div className="space-y-2 rounded-[var(--radius-control)] border border-border bg-paper p-3">
-      <Select value={meetingId} onChange={(e) => setMeetingId(e.target.value)}>
+      <Select
+        aria-label="Encontro da formação"
+        value={meetingId}
+        onChange={(e) => setMeetingId(e.target.value)}
+      >
         <option value="">Escolha o encontro…</option>
         {reunioesDisponiveis.map((r) => (
           <option key={r.id} value={r.id}>
@@ -71,6 +75,7 @@ export function RegistrarFormacao({
         ))}
       </Select>
       <Input
+        aria-label="Tema da formação"
         value={tema}
         onChange={(e) => setTema(e.target.value)}
         placeholder="Tema da formação"
@@ -80,6 +85,7 @@ export function RegistrarFormacao({
           type="number"
           min={0.5}
           step="0.5"
+          aria-label="Horas certificadas"
           value={horas}
           onChange={(e) => setHoras(e.target.value)}
           className="w-28"

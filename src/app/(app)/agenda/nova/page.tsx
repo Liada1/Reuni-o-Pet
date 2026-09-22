@@ -4,6 +4,8 @@ import { getMeetingTypes, getLocations } from "@/features/configuracoes";
 import { NovaReuniaoForm } from "@/features/agenda/components/nova-reuniao-form";
 import { isCoordenacao } from "@/lib/permissions";
 
+export const metadata = { title: "Nova reunião" };
+
 export default async function NovaReuniaoPage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");

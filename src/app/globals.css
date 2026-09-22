@@ -6,6 +6,10 @@
   --color-paper: #f6f3ec;
   --color-surface: #ffffff;
   --color-border: #e2ddd1;
+  /* Borda de campo e controle. A `--color-border` de cartão é decorativa e
+     pode ser clara, mas a borda que delimita um input precisa de 3:1 contra
+     o fundo (WCAG 1.4.11), senão o campo some pra quem enxerga pouco. */
+  --color-border-strong: #8f8878;
   --color-ink: #1e2a2f;
   --color-ink-muted: #5b6468;
 
@@ -13,6 +17,11 @@
   --color-primary-hover: #245640;
   --color-accent: #d9a441;
   --color-alert: #b5462f;
+  /* Texto por cima de `primary`/`alert`. No claro é branco; no escuro os
+     fundos ficam claros e o texto tem que virar escuro. */
+  --color-on-fill: #ffffff;
+
+  color-scheme: light;
 
   --color-type-gat: #3d6e8f;
   --color-type-area: #2f6b4f;
@@ -25,25 +34,34 @@
   --color-paper: #161c1f;
   --color-surface: #1f272b;
   --color-border: #313b40;
+  --color-border-strong: #727e84;
   --color-ink: #e9e5dc;
   --color-ink-muted: #9aa3a7;
 
-  --color-primary: #4a9070;
-  --color-primary-hover: #5ca882;
+  /* O verde de antes (#4a9070) dava 3,99:1 como texto sobre `surface` e
+     3,81:1 sob texto branco — reprovava nos dois usos. Este passa em ambos
+     (5,25:1 e 6,27:1) sem perder o verde. */
+  --color-primary: #5aa77f;
+  --color-primary-hover: #68b98d;
   --color-accent: #e0b565;
   --color-alert: #d97557;
+  --color-on-fill: #10171a;
+
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-paper: var(--color-paper);
   --color-surface: var(--color-surface);
   --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
   --color-ink: var(--color-ink);
   --color-ink-muted: var(--color-ink-muted);
   --color-primary: var(--color-primary);
   --color-primary-hover: var(--color-primary-hover);
   --color-accent: var(--color-accent);
   --color-alert: var(--color-alert);
+  --color-on-fill: var(--color-on-fill);
 
   --color-type-gat: var(--color-type-gat);
   --color-type-area: var(--color-type-area);
@@ -62,6 +80,24 @@
 body {
   background: var(--color-paper);
   color: var(--color-ink);
+}
+
+/* Foco visível em tudo que recebe foco, não só nos componentes que lembraram
+   de declarar. O anel usa `primary`, que passa no contraste nos dois temas. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Linhas finas de "pauta de caderno", usadas com moderação no editor de ata. */

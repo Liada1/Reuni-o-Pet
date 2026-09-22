@@ -205,6 +205,7 @@ export function RevisaoAta({
         </h2>
         {editavel ? (
           <Select
+            aria-label="Próxima reunião"
             value={ata.minute.proxima_reuniao_id ?? ""}
             onChange={(e) =>
               startTransition(() =>

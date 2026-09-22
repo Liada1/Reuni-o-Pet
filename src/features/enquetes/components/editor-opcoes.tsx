@@ -85,16 +85,19 @@ export function EditorOpcoes({ value, onChange, locais }: EditorOpcoesProps) {
         >
           <Input
             type="date"
+            aria-label={`Data da opção ${indice + 1}`}
             value={opcao.dataISO}
             onChange={(e) => atualizar(indice, { dataISO: e.target.value })}
           />
           <Input
             type="time"
+            aria-label={`Hora da opção ${indice + 1}`}
             value={opcao.horaMinuto}
             onChange={(e) => atualizar(indice, { horaMinuto: e.target.value })}
             className="w-28"
           />
           <Select
+            aria-label={`Modalidade da opção ${indice + 1}`}
             value={opcao.modalidade}
             onChange={(e) =>
               atualizar(indice, { modalidade: e.target.value as "presencial" | "online" })
@@ -105,6 +108,7 @@ export function EditorOpcoes({ value, onChange, locais }: EditorOpcoesProps) {
           </Select>
           {opcao.modalidade === "presencial" ? (
             <Select
+              aria-label={`Local da opção ${indice + 1}`}
               value={opcao.locationId ?? ""}
               onChange={(e) => atualizar(indice, { locationId: e.target.value || null })}
             >
@@ -117,6 +121,7 @@ export function EditorOpcoes({ value, onChange, locais }: EditorOpcoesProps) {
             </Select>
           ) : (
             <Input
+              aria-label={`Link da chamada da opção ${indice + 1}`}
               placeholder="Link da chamada"
               value={opcao.linkOnline ?? ""}
               onChange={(e) => atualizar(indice, { linkOnline: e.target.value })}
@@ -158,10 +163,12 @@ export function EditorOpcoes({ value, onChange, locais }: EditorOpcoesProps) {
           <div className="grid gap-2 sm:grid-cols-3">
             <Input
               type="time"
+              aria-label="Hora dos dias repetidos"
               value={repeticao.horaMinuto}
               onChange={(e) => setRepeticao({ ...repeticao, horaMinuto: e.target.value })}
             />
             <Select
+              aria-label="Modalidade dos dias repetidos"
               value={repeticao.modalidade}
               onChange={(e) =>
                 setRepeticao({
@@ -175,6 +182,7 @@ export function EditorOpcoes({ value, onChange, locais }: EditorOpcoesProps) {
             </Select>
             {repeticao.modalidade === "presencial" ? (
               <Select
+                aria-label="Local dos dias repetidos"
                 value={repeticao.locationId}
                 onChange={(e) => setRepeticao({ ...repeticao, locationId: e.target.value })}
               >
@@ -187,6 +195,7 @@ export function EditorOpcoes({ value, onChange, locais }: EditorOpcoesProps) {
               </Select>
             ) : (
               <Input
+                aria-label="Link da chamada dos dias repetidos"
                 placeholder="Link da chamada"
                 value={repeticao.linkOnline}
                 onChange={(e) => setRepeticao({ ...repeticao, linkOnline: e.target.value })}

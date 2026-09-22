@@ -16,6 +16,29 @@ import {
 } from "@/features/atas/actions";
 import type { MutacaoOutbox } from "./types";
 
+/**
+ * Com `experimental.useOffline` ligado, uma Server Action que falha por
+ * rede não rejeita mais: o Next segura a chamada pendente e a repete
+ * quando a conexão volta. Isso é bom pro resto do app, mas aqui travaria a
+ * fila — `sincronizandoPorReuniao` ficaria preso e o status pararia em
+ * "salvando" pra sempre. Então cada mutação tem um limite de tempo, e o
+ * estouro devolve a fila pro fluxo normal de repetição.
+ *
+ * Repetir é seguro porque toda ação da fila é idempotente: o id vem do
+ * cliente e a gravação é `upsert` com `onConflict`. Se a chamada pendurada
+ * chegar depois, ela reaplica o mesmo registro.
+ */
+const LIMITE_MS = 20_000;
+
+const ESTOUROU = Symbol("estourou");
+
+function comLimiteDeTempo<T>(promessa: Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(ESTOUROU), LIMITE_MS);
+    promessa.then(resolve, reject).finally(() => clearTimeout(timer));
+  });
+}
+
 type Ouvinte = (status: StatusSync) => void;
 export type StatusSync = "salvo" | "salvando" | "offline" | "erro";
 
@@ -78,11 +101,15 @@ export async function tentarSincronizar(meetingId: string): Promise<void> {
 
     for (const mutacao of pendentes) {
       try {
-        await executar(mutacao);
+        await comLimiteDeTempo(executar(mutacao));
         if (mutacao.seq !== undefined) await removerMutacao(mutacao.seq);
-      } catch {
+      } catch (erro) {
         await incrementarTentativa(mutacao);
-        notificar(meetingId, navigator.onLine ? "erro" : "offline");
+        // Estouro de tempo é rede ruim, não falha do servidor — mesmo com
+        // `navigator.onLine` dizendo que está tudo bem (portal cativo, DNS
+        // morto, Wi-Fi sem saída).
+        const semRede = erro === ESTOUROU || !navigator.onLine;
+        notificar(meetingId, semRede ? "offline" : "erro");
         return;
       }
     }

@@ -77,6 +77,7 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
               </div>
 
               <Select
+                aria-label={`Perfil de ${m.nome_completo}`}
                 value={m.role}
                 disabled={pending}
                 className="w-auto"
@@ -92,6 +93,7 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
               </Select>
 
               <Select
+                aria-label={`GAT de ${m.nome_completo}`}
                 value={m.gat_id ?? ""}
                 disabled={pending}
                 className="w-auto"

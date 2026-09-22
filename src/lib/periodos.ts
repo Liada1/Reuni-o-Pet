@@ -107,3 +107,26 @@ export function rotuloPeriodoCurto(p: Periodo): string {
   const curto = (iso: string) => `${iso.slice(8, 10)}/${iso.slice(5, 7)}`;
   return `${curto(p.inicioISO)} – ${curto(p.fimISO)}`;
 }
+
+/**
+ * "Hoje" no fuso do grupo, como data ingênua — só os campos de calendário
+ * (ano/mês/dia) têm significado. Serve de âncora para contas de calendário
+ * que não podem depender do fuso do servidor.
+ */
+export function hojeIngenuo(fusoHorario: string): Date {
+  return dataIngenua(formatInTimeZone(new Date(), fusoHorario, "yyyy-MM-dd"));
+}
+
+/** Uma data ingênua a partir de yyyy-MM-dd, quando vem de parâmetro de URL. */
+export function ingenua(dataISO: string): Date {
+  return dataIngenua(dataISO);
+}
+
+/**
+ * Período arbitrário entre duas datas ingênuas (ambas inclusivas), com as
+ * bordas convertidas para instantes no fuso do grupo — é o que a Agenda usa
+ * para consultar o banco sem depender do fuso do servidor.
+ */
+export function periodoEntre(inicio: Date, fim: Date, fusoHorario: string): Periodo {
+  return periodo(inicio, fim, fusoHorario);
+}

@@ -57,12 +57,18 @@ export function FormacaoItem({
   if (editando) {
     return (
       <div className="space-y-2 rounded-[var(--radius-control)] border border-border bg-paper p-3">
-        <Input value={tema} onChange={(e) => setTema(e.target.value)} placeholder="Tema" />
+        <Input
+          aria-label="Tema da formação"
+          value={tema}
+          onChange={(e) => setTema(e.target.value)}
+          placeholder="Tema"
+        />
         <div className="flex items-center gap-2">
           <Input
             type="number"
             min={0.5}
             step="0.5"
+            aria-label="Horas certificadas da formação"
             value={horas}
             onChange={(e) => setHoras(e.target.value)}
             className="w-28"
@@ -72,7 +78,12 @@ export function FormacaoItem({
             <Check className="h-4 w-4" strokeWidth={1.75} />
             Salvar
           </Button>
-          <Button type="button" variant="fantasma" onClick={() => setEditando(false)}>
+          <Button
+            type="button"
+            variant="fantasma"
+            aria-label="Cancelar edição"
+            onClick={() => setEditando(false)}
+          >
             <X className="h-4 w-4" strokeWidth={1.75} />
           </Button>
         </div>

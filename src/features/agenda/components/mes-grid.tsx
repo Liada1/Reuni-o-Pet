@@ -2,6 +2,7 @@ import Link from "next/link";
 import { isSameMonth, isSameDay, format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { formatarHora, paraInputData } from "@/lib/dates";
+import { textoSobre } from "@/lib/cor";
 import type { ReuniaoComDetalhes } from "../types";
 
 interface MesGridProps {
@@ -42,19 +43,22 @@ export function MesGrid({ dias, mesAncora, hoje, reunioes, fusoHorario }: MesGri
               {format(dia, "d")}
             </p>
             <div className="mt-1 space-y-0.5">
-              {doDia.slice(0, 3).map((r) => (
+              {doDia.slice(0, 3).map((r) => {
+                const cor = r.meeting_types?.cor ?? "#2F6B4F";
+                return (
                 <Link
                   key={r.id}
                   href={`/reunioes/${r.id}`}
                   className={cn(
-                    "block truncate rounded px-1 py-0.5 text-[10px] leading-tight text-white",
+                    "block truncate rounded px-1 py-0.5 text-[10px] leading-tight",
                     r.status === "cancelada" && "opacity-50 line-through",
                   )}
-                  style={{ backgroundColor: r.meeting_types?.cor ?? "#2F6B4F" }}
+                  style={{ backgroundColor: cor, color: textoSobre(cor) }}
                 >
                   {formatarHora(r.inicio, fusoHorario)} {r.titulo || r.meeting_types?.nome}
                 </Link>
-              ))}
+                );
+              })}
               {doDia.length > 3 && (
                 <p className="text-[10px] text-ink-muted">+{doDia.length - 3}</p>
               )}

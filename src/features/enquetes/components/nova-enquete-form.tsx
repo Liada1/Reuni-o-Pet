@@ -153,6 +153,7 @@ export function NovaEnqueteForm({
         <div className="flex flex-wrap items-center gap-2">
           <Input
             type="date"
+            aria-label="Data do prazo para votar"
             value={prazoData}
             disabled={semPrazo}
             onChange={(e) => setPrazoData(e.target.value)}
@@ -160,6 +161,7 @@ export function NovaEnqueteForm({
           />
           <Input
             type="time"
+            aria-label="Hora do prazo para votar"
             value={prazoHora}
             disabled={semPrazo}
             onChange={(e) => setPrazoHora(e.target.value)}
@@ -196,7 +198,12 @@ export function NovaEnqueteForm({
         </div>
 
         {publicoAlvo === "gat" && (
-          <Select className="mt-2 max-w-xs" value={gatId} onChange={(e) => setGatId(e.target.value)}>
+          <Select
+            aria-label="GAT que deve votar"
+            className="mt-2 max-w-xs"
+            value={gatId}
+            onChange={(e) => setGatId(e.target.value)}
+          >
             {gats.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.nome}

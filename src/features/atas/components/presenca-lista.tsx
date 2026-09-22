@@ -31,6 +31,12 @@ const ICONE: Record<AttendanceStatus, typeof UserCheck> = {
   justificado: UserMinus,
 };
 
+const ROTULO: Record<AttendanceStatus, string> = {
+  presente: "presente",
+  ausente: "ausente",
+  justificado: "falta justificada",
+};
+
 const ESTILO: Record<AttendanceStatus, string> = {
   presente: "border-primary bg-primary/10 text-primary",
   ausente: "border-border text-ink-muted",
@@ -67,6 +73,7 @@ export function PresencaLista({
             <button
               key={p.id}
               type="button"
+              aria-label={`${nome}: ${ROTULO[p.status]}. Tocar para marcar como ${ROTULO[proximoStatus(p.status)]}`}
               onClick={() => onMarcar(p.id, proximoStatus(p.status))}
               className={cn(
                 "flex min-h-[48px] items-center gap-2 rounded-full border pl-1 pr-3 py-1",
@@ -97,12 +104,14 @@ export function PresencaLista({
       {aberto && (
         <div className="flex flex-wrap items-center gap-2 rounded-[var(--radius-panel)] border border-border bg-paper p-3">
           <Input
+            aria-label="Nome do visitante"
             placeholder="Nome do visitante"
             value={nomeVisitante}
             onChange={(e) => setNomeVisitante(e.target.value)}
             className="max-w-xs"
           />
           <Input
+            aria-label="Instituição do visitante (opcional)"
             placeholder="Instituição (opcional)"
             value={instituicaoVisitante}
             onChange={(e) => setInstituicaoVisitante(e.target.value)}

@@ -3,6 +3,8 @@ import { getConvitePublico } from "@/features/membros";
 import { getProgramaSettings, getPerfisNomes } from "@/features/configuracoes";
 import { Ban } from "lucide-react";
 
+export const metadata = { title: "Convite" };
+
 export default async function ConvitePage({
   params,
 }: {
@@ -19,9 +21,9 @@ export default async function ConvitePage({
     <div className="flex min-h-svh flex-col items-center justify-center bg-paper px-4 py-10">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <p className="font-display text-2xl font-semibold text-ink">
+          <h1 className="font-display text-2xl font-semibold text-ink">
             {programa.nome_programa}
-          </p>
+          </h1>
           {programa.nome_grupo && (
             <p className="text-sm text-ink-muted">{programa.nome_grupo}</p>
           )}

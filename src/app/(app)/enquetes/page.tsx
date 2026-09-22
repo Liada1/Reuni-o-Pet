@@ -10,6 +10,8 @@ import { EstadoVazio } from "@/components/ui/estado-vazio";
 import { formatarDataHoraCompleta } from "@/lib/dates";
 import { isCoordenacao } from "@/lib/permissions";
 
+export const metadata = { title: "Enquetes" };
+
 const STATUS_TEXTO: Record<string, string> = {
   aberta: "Aberta",
   confirmada: "Confirmada",

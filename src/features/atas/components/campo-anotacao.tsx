@@ -88,11 +88,13 @@ export function CampoAnotacao({ onEnviar, onFoto }: CampoAnotacaoProps) {
           type="file"
           accept="image/*"
           capture="environment"
+          aria-label="Tirar foto e anexar à ata"
           className="hidden"
           onChange={selecionarFoto}
         />
       </label>
       <input
+        aria-label="Anotação"
         value={texto}
         onChange={(e) => setTexto(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && enviar()}
@@ -117,7 +119,7 @@ export function CampoAnotacao({ onEnviar, onFoto }: CampoAnotacaoProps) {
       <button
         type="button"
         onClick={enviar}
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-white hover:bg-primary-hover"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-on-fill hover:bg-primary-hover"
         aria-label="Enviar anotação"
       >
         <Send className="h-5 w-5" strokeWidth={1.75} />

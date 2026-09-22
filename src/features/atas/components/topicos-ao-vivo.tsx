@@ -69,7 +69,7 @@ export function TopicosAoVivo({
                 {bloco.titulo}
               </span>
               {ativo && (
-                <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-white">
+                <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-medium text-on-fill">
                   ANOTANDO AQUI
                 </span>
               )}
@@ -95,6 +95,7 @@ export function TopicosAoVivo({
         <div className="flex items-center gap-2">
           <Input
             autoFocus
+            aria-label="Nome do tópico"
             placeholder="Nome do tópico"
             value={novoTopico}
             onChange={(e) => setNovoTopico(e.target.value)}

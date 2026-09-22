@@ -58,6 +58,7 @@ export function ComentariosAta({
       </ul>
       <div className="flex items-center gap-2">
         <Input
+          aria-label="Comentário sobre a ata"
           placeholder="Deixe um comentário"
           value={texto}
           onChange={(e) => setTexto(e.target.value)}

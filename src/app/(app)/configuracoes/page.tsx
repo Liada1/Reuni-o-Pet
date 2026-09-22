@@ -18,6 +18,8 @@ import {
 } from "@/features/configuracoes";
 import { isCoordenacao } from "@/lib/permissions";
 
+export const metadata = { title: "Configurações" };
+
 export default async function ConfiguracoesPage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");

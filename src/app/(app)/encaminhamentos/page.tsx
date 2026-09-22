@@ -6,6 +6,8 @@ import { Select } from "@/components/ui/select";
 import { isCoordenacao } from "@/lib/permissions";
 import type { ActionItemStatus } from "@/lib/supabase/types";
 
+export const metadata = { title: "Encaminhamentos" };
+
 export default async function EncaminhamentosPage({
   searchParams,
 }: {
@@ -29,7 +31,7 @@ export default async function EncaminhamentosPage({
       </div>
 
       <form className="flex flex-wrap gap-2" action="/encaminhamentos">
-        <Select name="pessoa" defaultValue={pessoa ?? ""} className="w-auto">
+        <Select name="pessoa" aria-label="Filtrar por responsável" defaultValue={pessoa ?? ""} className="w-auto">
           <option value="">Todas as pessoas</option>
           {membrosAtivos.map((m) => (
             <option key={m.id} value={m.id}>
@@ -37,7 +39,7 @@ export default async function EncaminhamentosPage({
             </option>
           ))}
         </Select>
-        <Select name="status" defaultValue={status ?? ""} className="w-auto">
+        <Select name="status" aria-label="Filtrar por status do encaminhamento" defaultValue={status ?? ""} className="w-auto">
           <option value="">Todos os status</option>
           <option value="pendente">Pendente</option>
           <option value="em_andamento">Em andamento</option>

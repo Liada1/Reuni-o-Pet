@@ -39,6 +39,7 @@ export function EncaminhamentosLista({
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm text-ink">{item.descricao}</p>
               <Select
+                aria-label={`Status de "${item.descricao}"`}
                 value={item.status}
                 disabled={!podeEditar}
                 className="w-auto shrink-0"

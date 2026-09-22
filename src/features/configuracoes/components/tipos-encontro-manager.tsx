@@ -62,6 +62,7 @@ export function TiposEncontroManager({ inicial }: { inicial: TipoEncontro[] }) {
               aria-label={`Cor de ${tipo.nome}`}
             />
             <Input
+              aria-label={`Nome do tipo "${tipo.nome}"`}
               value={tipo.nome}
               onChange={(e) => atualizar(tipo.id, { nome: e.target.value })}
             />
@@ -70,6 +71,7 @@ export function TiposEncontroManager({ inicial }: { inicial: TipoEncontro[] }) {
                 type="number"
                 min={15}
                 step={15}
+                aria-label={`Duração padrão de "${tipo.nome}", em minutos`}
                 value={tipo.duracao_padrao_minutos}
                 onChange={(e) =>
                   atualizar(tipo.id, {
@@ -99,6 +101,7 @@ export function TiposEncontroManager({ inicial }: { inicial: TipoEncontro[] }) {
           aria-label="Cor do novo tipo"
         />
         <Input
+          aria-label="Nome do novo tipo de encontro"
           placeholder="Novo tipo de encontro"
           value={novo.nome}
           onChange={(e) => setNovo({ ...novo, nome: e.target.value })}
@@ -109,13 +112,20 @@ export function TiposEncontroManager({ inicial }: { inicial: TipoEncontro[] }) {
             type="number"
             min={15}
             step={15}
+            aria-label="Duração padrão do novo tipo, em minutos"
             value={novo.duracao}
             onChange={(e) => setNovo({ ...novo, duracao: Number(e.target.value) })}
             className="w-20"
           />
           <span>min</span>
         </div>
-        <Button type="button" variant="secundario" onClick={adicionar} disabled={pending}>
+        <Button
+          type="button"
+          variant="secundario"
+          aria-label="Adicionar tipo de encontro"
+          onClick={adicionar}
+          disabled={pending}
+        >
           <Plus className="h-4 w-4" strokeWidth={1.75} />
         </Button>
       </div>

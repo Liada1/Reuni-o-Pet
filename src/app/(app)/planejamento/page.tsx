@@ -8,6 +8,8 @@ import { mesValido, mesVizinho, rotuloMes } from "@/lib/periodos";
 import { formatarMinutos } from "@/lib/duracao";
 import { cn } from "@/lib/utils";
 
+export const metadata = { title: "Planejamento" };
+
 export default async function PlanejamentoPage({
   searchParams,
 }: {

@@ -44,6 +44,7 @@ export function GatsManager({ inicial }: { inicial: Gat[] }) {
         {gats.map((gat) => (
           <li key={gat.id} className="flex items-center gap-2">
             <Input
+              aria-label={`Nome do GAT "${gat.nome}"`}
               value={gat.nome}
               onChange={(e) => renomear(gat.id, e.target.value)}
               className={cn(!gat.ativo && "opacity-50")}
@@ -60,6 +61,7 @@ export function GatsManager({ inicial }: { inicial: Gat[] }) {
       </ul>
       <div className="flex items-center gap-2 pt-1">
         <Input
+          aria-label="Nome do novo GAT"
           placeholder="Novo GAT"
           value={novoNome}
           onChange={(e) => setNovoNome(e.target.value)}

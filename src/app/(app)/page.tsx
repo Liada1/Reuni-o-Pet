@@ -12,6 +12,8 @@ import { Surface } from "@/components/ui/surface";
 import { formatarDiaSemana, formatarData, formatarDataSimples, formatarHora } from "@/lib/dates";
 import type { MinuteStatus } from "@/lib/supabase/types";
 
+export const metadata = { title: "Início" };
+
 const STATUS_ATA_TEXTO: Record<MinuteStatus, string> = {
   rascunho: "Rascunho",
   em_revisao: "Em revisão",

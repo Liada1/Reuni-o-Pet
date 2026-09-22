@@ -13,16 +13,18 @@ import {
   format,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { toZonedTime } from "date-fns-tz";
 import { getCurrentProfile } from "@/features/auth";
 import { getProgramaSettings } from "@/features/configuracoes";
 import { getReunioes } from "@/features/agenda";
 import { agora, agoraMaisMs } from "@/lib/dates";
+import { hojeIngenuo, ingenua, periodoEntre } from "@/lib/periodos";
 import { MesGrid } from "@/features/agenda/components/mes-grid";
 import { Lista } from "@/features/agenda/components/lista";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { isCoordenacao } from "@/lib/permissions";
+
+export const metadata = { title: "Agenda" };
 
 type Visualizacao = "mes" | "semana" | "lista";
 
@@ -39,11 +41,12 @@ export default async function AgendaPage({
 
   const [perfil, programa] = await Promise.all([getCurrentProfile(), getProgramaSettings()]);
   const coordenacao = isCoordenacao(perfil);
-  // "hoje" precisa refletir o fuso do grupo, não o do servidor (ex: Vercel
-  // roda em UTC, mas o grupo pode estar em America/Fortaleza) — senão o mês
-  // corrente e o destaque de "hoje" ficam errados perto da meia-noite.
-  const hoje = toZonedTime(agora(), programa.fuso_horario);
-  const ancora = dataParam ? new Date(`${dataParam}T00:00:00`) : hoje;
+  // Tudo aqui é calendário, não instante: "hoje" e a âncora são datas
+  // ingênuas no fuso do grupo, e só as bordas da consulta viram instante
+  // (via `periodoEntre`). Sem isso o mês corrente e o recorte das consultas
+  // seguiriam o fuso do servidor — a Vercel roda em UTC e o grupo não.
+  const hoje = hojeIngenuo(programa.fuso_horario);
+  const ancora = dataParam ? ingenua(dataParam) : hoje;
 
   const mesAncora = startOfMonth(ancora);
   const inicioGrade = startOfWeek(mesAncora, { weekStartsOn: 1 });
@@ -62,16 +65,12 @@ export default async function AgendaPage({
     });
     conteudo = <Lista reunioes={reunioes} fusoHorario={programa.fuso_horario} />;
   } else if (visualizacao === "semana") {
-    const reunioes = await getReunioes({
-      inicio: inicioSemana,
-      fim: new Date(fimSemana.getTime() + 86_400_000),
-    });
+    const { inicioUtc, fimUtc } = periodoEntre(inicioSemana, fimSemana, programa.fuso_horario);
+    const reunioes = await getReunioes({ inicio: inicioUtc, fim: fimUtc });
     conteudo = <Lista reunioes={reunioes} fusoHorario={programa.fuso_horario} />;
   } else {
-    const reunioes = await getReunioes({
-      inicio: inicioGrade,
-      fim: new Date(fimGrade.getTime() + 86_400_000),
-    });
+    const { inicioUtc, fimUtc } = periodoEntre(inicioGrade, fimGrade, programa.fuso_horario);
+    const reunioes = await getReunioes({ inicio: inicioUtc, fim: fimUtc });
     conteudo = (
       <>
         <div className="hidden md:block">
@@ -105,7 +104,7 @@ export default async function AgendaPage({
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">Agenda</h1>
           {visualizacao !== "lista" && (
-            <p className="text-sm capitalize text-ink-muted">
+            <p className="text-sm text-ink-muted first-letter:uppercase">
               {visualizacao === "semana"
                 ? `Semana de ${format(inicioSemana, "dd/MM")} a ${format(fimSemana, "dd/MM")}`
                 : format(mesAncora, "MMMM 'de' yyyy", { locale: ptBR })}

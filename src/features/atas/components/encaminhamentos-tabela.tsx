@@ -58,6 +58,7 @@ export function EncaminhamentosTabela({
                 <td className="py-2 pr-3">
                   {podeEditarTudo ? (
                     <Input
+                      aria-label="Descrição do encaminhamento"
                       defaultValue={item.descricao}
                       onBlur={(e) =>
                         e.target.value !== item.descricao &&
@@ -73,6 +74,7 @@ export function EncaminhamentosTabela({
                 <td className="py-2 pr-3">
                   {podeEditarTudo ? (
                     <Select
+                      aria-label={`Responsável por "${item.descricao}"`}
                       value={item.responsavel_id ?? ""}
                       onChange={(e) =>
                         startTransition(() =>
@@ -97,6 +99,7 @@ export function EncaminhamentosTabela({
                   {podeEditarTudo ? (
                     <Input
                       type="date"
+                      aria-label={`Prazo de "${item.descricao}"`}
                       defaultValue={item.prazo ?? ""}
                       onBlur={(e) =>
                         e.target.value !== item.prazo &&
@@ -113,6 +116,7 @@ export function EncaminhamentosTabela({
                 </td>
                 <td className="py-2 pr-3">
                   <Select
+                    aria-label={`Status de "${item.descricao}"`}
                     value={item.status}
                     disabled={!podeStatus}
                     className={cn(!podeStatus && "opacity-60")}

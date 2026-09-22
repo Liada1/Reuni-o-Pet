@@ -88,6 +88,7 @@ export function NotaItem({
       {formEncaminhamento && (
         <div className="mt-2 flex flex-wrap items-center gap-2 rounded-[var(--radius-control)] bg-paper p-2">
           <Select
+            aria-label="Responsável pelo encaminhamento"
             value={responsavelId}
             onChange={(e) => setResponsavelId(e.target.value)}
             className="max-w-[160px]"
@@ -101,6 +102,7 @@ export function NotaItem({
           </Select>
           <Input
             type="date"
+            aria-label="Prazo do encaminhamento"
             value={prazo}
             onChange={(e) => setPrazo(e.target.value)}
             className="w-auto"

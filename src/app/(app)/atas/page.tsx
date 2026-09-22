@@ -10,6 +10,8 @@ import { Select } from "@/components/ui/select";
 import { formatarData } from "@/lib/dates";
 import type { MinuteStatus } from "@/lib/supabase/types";
 
+export const metadata = { title: "Atas" };
+
 const STATUS_TEXTO: Record<MinuteStatus, string> = {
   rascunho: "Rascunho",
   em_revisao: "Em revisão",
@@ -36,8 +38,8 @@ export default async function AtasPage({
       </div>
 
       <form className="flex flex-wrap gap-2" action="/atas">
-        <Input name="busca" placeholder="Buscar nas anotações…" defaultValue={busca} className="max-w-xs" />
-        <Select name="tipo" defaultValue={tipo ?? ""} className="w-auto">
+        <Input name="busca" aria-label="Buscar nas anotações" placeholder="Buscar nas anotações…" defaultValue={busca} className="max-w-xs" />
+        <Select name="tipo" aria-label="Filtrar por tipo de encontro" defaultValue={tipo ?? ""} className="w-auto">
           <option value="">Todos os tipos</option>
           {tipos.map((t) => (
             <option key={t.id} value={t.id}>
@@ -45,7 +47,7 @@ export default async function AtasPage({
             </option>
           ))}
         </Select>
-        <Select name="status" defaultValue={status ?? ""} className="w-auto">
+        <Select name="status" aria-label="Filtrar por status da ata" defaultValue={status ?? ""} className="w-auto">
           <option value="">Todos os status</option>
           {(Object.keys(STATUS_TEXTO) as MinuteStatus[]).map((s) => (
             <option key={s} value={s}>

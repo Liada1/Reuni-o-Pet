@@ -40,7 +40,7 @@ export function MiniCalendario({ selecionadas, onToggle }: MiniCalendarioProps) 
         >
           <ChevronLeft className="h-4 w-4" strokeWidth={1.75} />
         </button>
-        <p className="text-sm font-medium capitalize text-ink">
+        <p className="text-sm font-medium text-ink first-letter:uppercase">
           {format(mesAtual, "MMMM 'de' yyyy", { locale: ptBR })}
         </p>
         <button
@@ -65,12 +65,17 @@ export function MiniCalendario({ selecionadas, onToggle }: MiniCalendarioProps) 
             <button
               key={iso}
               type="button"
+              // Só o número do dia não diz nada num leitor de tela ("15"):
+              // o rótulo traz a data por extenso, e `aria-pressed` diz se o
+              // dia está escolhido — informação que hoje só a cor passa.
+              aria-label={format(dia, "EEEE, d 'de' MMMM", { locale: ptBR })}
+              aria-pressed={selecionado}
               onClick={() => onToggle(iso)}
               className={cn(
                 "aspect-square rounded-[var(--radius-control)] font-mono text-xs",
                 !isSameMonth(dia, mesAtual) && "text-ink-muted/40",
                 isSameMonth(dia, mesAtual) && !selecionado && "text-ink hover:bg-paper",
-                selecionado && "bg-primary text-white",
+                selecionado && "bg-primary text-on-fill",
                 isToday(dia) && !selecionado && "font-semibold text-primary",
               )}
             >

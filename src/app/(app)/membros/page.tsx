@@ -12,6 +12,8 @@ import {
 import { isCoordenacao } from "@/lib/permissions";
 import { getOrigin } from "@/lib/origin";
 
+export const metadata = { title: "Membros" };
+
 export default async function MembrosPage() {
   const perfil = await getCurrentProfile();
   if (!isCoordenacao(perfil)) redirect("/");

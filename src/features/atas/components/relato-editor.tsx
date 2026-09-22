@@ -51,6 +51,7 @@ export function RelatoEditor({
       <p className="text-sm font-medium text-ink">{titulo}</p>
       {editavel ? (
         <textarea
+          aria-label={`Relato do tópico "${titulo}"`}
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
           onBlur={() => salvar(texto)}

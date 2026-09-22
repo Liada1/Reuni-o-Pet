@@ -13,6 +13,8 @@ import { mesValido, mesVizinho, rotuloMes } from "@/lib/periodos";
 import { formatarMinutos } from "@/lib/duracao";
 import { isCoordenacao } from "@/lib/permissions";
 
+export const metadata = { title: "Frequência" };
+
 export default async function FrequenciaPage({
   searchParams,
 }: {

@@ -47,10 +47,12 @@ export function LocationsManager({ inicial }: { inicial: Location[] }) {
             className={cn("grid gap-2 sm:grid-cols-[1fr_1fr_auto]", !local.ativo && "opacity-50")}
           >
             <Input
+              aria-label={`Nome do local "${local.nome}"`}
               value={local.nome}
               onChange={(e) => atualizar(local.id, { nome: e.target.value })}
             />
             <Input
+              aria-label={`Endereço de "${local.nome}"`}
               placeholder="Endereço (opcional)"
               value={local.endereco ?? ""}
               onChange={(e) => atualizar(local.id, { endereco: e.target.value })}
@@ -67,17 +69,25 @@ export function LocationsManager({ inicial }: { inicial: Location[] }) {
       </ul>
       <div className="grid gap-2 pt-1 sm:grid-cols-[1fr_1fr_auto]">
         <Input
+          aria-label="Nome do novo local"
           placeholder="Novo local"
           value={novo.nome}
           onChange={(e) => setNovo({ ...novo, nome: e.target.value })}
           onKeyDown={(e) => e.key === "Enter" && adicionar()}
         />
         <Input
+          aria-label="Endereço do novo local (opcional)"
           placeholder="Endereço (opcional)"
           value={novo.endereco}
           onChange={(e) => setNovo({ ...novo, endereco: e.target.value })}
         />
-        <Button type="button" variant="secundario" onClick={adicionar} disabled={pending}>
+        <Button
+          type="button"
+          variant="secundario"
+          aria-label="Adicionar local"
+          onClick={adicionar}
+          disabled={pending}
+        >
           <Plus className="h-4 w-4" strokeWidth={1.75} />
         </Button>
       </div>
