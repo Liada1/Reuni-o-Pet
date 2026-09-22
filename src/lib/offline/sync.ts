@@ -17,12 +17,13 @@ import {
 import type { MutacaoOutbox } from "./types";
 
 /**
- * Com `experimental.useOffline` ligado, uma Server Action que falha por
- * rede não rejeita mais: o Next segura a chamada pendente e a repete
- * quando a conexão volta. Isso é bom pro resto do app, mas aqui travaria a
- * fila — `sincronizandoPorReuniao` ficaria preso e o status pararia em
- * "salvando" pra sempre. Então cada mutação tem um limite de tempo, e o
- * estouro devolve a fila pro fluxo normal de repetição.
+ * Limite de tempo por mutação.
+ *
+ * `navigator.onLine` mente no caso mais comum da sala de reunião: Wi-Fi
+ * conectado, sem saída para a internet. Aí a Server Action não rejeita —
+ * fica pendurada. Sem limite de tempo, `sincronizandoPorReuniao` ficaria
+ * preso e o status pararia em "salvando" para sempre, com a pessoa achando
+ * que a ata foi salva.
  *
  * Repetir é seguro porque toda ação da fila é idempotente: o id vem do
  * cliente e a gravação é `upsert` com `onConflict`. Se a chamada pendurada

@@ -1,26 +1,44 @@
 "use client";
 
-import { useOffline } from "next/offline";
+import { useEffect, useState } from "react";
 import { WifiOff } from "lucide-react";
 
 /**
- * O `useOffline` do Next é mais confiável que `navigator.onLine`: além dos
- * eventos do navegador, ele entra em modo offline quando uma navegação ou
- * Server Action falha de fato — o caso do Wi-Fi conectado mas sem saída,
- * que é o que costuma acontecer na sala de reunião.
+ * Aviso de "sem conexão".
  *
- * As requisições ficam pendentes e são repetidas sozinhas; o aviso existe
- * para a pessoa não achar que o sistema travou.
+ * Usa os eventos `online`/`offline` do navegador, não o hook `useOffline`
+ * do Next — a flag experimental que o habilita ficou desligada de
+ * propósito (ver a nota no `next.config.ts`).
+ *
+ * `navigator.onLine` só enxerga a interface de rede, então Wi-Fi conectado
+ * sem saída continua dizendo "online" — por isso o aviso é um complemento,
+ * e quem de fato garante a ata é a fila em IndexedDB do modo reunião, que
+ * grava primeiro e sincroniza depois.
+ *
+ * O estado inicial é sempre "online" para servidor e cliente renderizarem
+ * igual; a correção vem no efeito, logo após a hidratação.
  */
 export function AvisoOffline() {
-  const offline = useOffline();
+  const [offline, setOffline] = useState(false);
+
+  useEffect(() => {
+    const atualizar = () => setOffline(!navigator.onLine);
+    atualizar();
+    window.addEventListener("online", atualizar);
+    window.addEventListener("offline", atualizar);
+    return () => {
+      window.removeEventListener("online", atualizar);
+      window.removeEventListener("offline", atualizar);
+    };
+  }, []);
 
   return (
     <div role="status" aria-live="polite">
       {offline && (
         <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-center gap-2 bg-accent px-4 py-1.5 text-center text-xs font-medium text-[#1e2a2f]">
           <WifiOff className="h-3.5 w-3.5 shrink-0" strokeWidth={2} aria-hidden="true" />
-          Sem conexão. O que você fizer agora é enviado quando a internet voltar.
+          Sem conexão. O que você registrar na reunião fica salvo no aparelho e é
+          enviado quando a internet voltar.
         </div>
       )}
     </div>
