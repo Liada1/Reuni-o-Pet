@@ -20,6 +20,7 @@ import { formatarData, formatarDiaSemana, formatarHora } from "@/lib/dates";
 import type { AtaCompleta, MinutePdf } from "../types";
 import type { DadosProgramaPdf } from "../pdf/ata-documento";
 import type { Database, MinuteStatus } from "@/lib/supabase/types";
+import { tituloDaAta } from "../titulo";
 
 type ReuniaoFutura = Database["public"]["Tables"]["meetings"]["Row"];
 
@@ -93,7 +94,7 @@ export function RevisaoAta({
       <div>
         <div className="flex items-center gap-2">
           <h1 className="font-display text-2xl font-semibold text-ink">
-            Ata do {ata.meeting.meeting_types?.nome ?? "encontro"}
+            {tituloDaAta(ata.meeting.meeting_types?.nome)}
           </h1>
           <Carimbo texto={STATUS_TEXTO[ata.minute.status]} />
         </div>

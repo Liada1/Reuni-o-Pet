@@ -1,6 +1,7 @@
 import { Document, Page, View, Text, StyleSheet, Image } from "@react-pdf/renderer";
 import type { AtaCompleta } from "../types";
 import { formatarData, formatarDataSimples, formatarHora } from "@/lib/dates";
+import { tituloDaAta } from "../titulo";
 
 const s = StyleSheet.create({
   page: { padding: "2.5cm", fontFamily: "Times-Roman", fontSize: 10.5, color: "#1E2A2F" },
@@ -121,7 +122,7 @@ export function AtaDocumento({
         </View>
 
         <Text style={s.titulo}>
-          Ata do {ata.meeting.meeting_types?.nome ?? "encontro"} — {formatarData(ata.meeting.inicio, fusoHorario)}
+          {tituloDaAta(ata.meeting.meeting_types?.nome)} · {formatarData(ata.meeting.inicio, fusoHorario)}
         </Text>
         <Text style={{ fontFamily: "Helvetica", fontSize: 10, color: "#5B6468", marginTop: -6, marginBottom: 10 }}>
           {tituloReuniao}
