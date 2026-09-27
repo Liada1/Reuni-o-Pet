@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/features/auth";
-import { isCoordenacao } from "@/lib/permissions";
+import { isAtivo, isCoordenacao } from "@/lib/permissions";
 import { formatarDataSimples } from "@/lib/dates";
 import type {
   AttendanceStatus,
@@ -15,12 +15,13 @@ import type {
 async function exigirPerfil() {
   const perfil = await getCurrentProfile();
   if (!perfil) throw new Error("É preciso estar autenticado.");
+  if (!isAtivo(perfil)) throw new Error("Sua conta ainda não está ativa no grupo.");
   return perfil;
 }
 
 async function podeEditarAta(meetingId: string): Promise<boolean> {
   const perfil = await getCurrentProfile();
-  if (!perfil) return false;
+  if (!perfil || !isAtivo(perfil)) return false;
   if (isCoordenacao(perfil)) return true;
   const supabase = await createClient();
   const { data } = await supabase

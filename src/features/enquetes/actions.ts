@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/features/auth";
 import { getProgramaSettings } from "@/features/configuracoes";
-import { isCoordenacao } from "@/lib/permissions";
+import { isAtivo, isCoordenacao } from "@/lib/permissions";
 import { gerarCodigoConvite } from "@/lib/utils";
 import { paraUtc } from "@/lib/dates";
 import type { NovaOpcaoInput, PollVoto } from "./types";
@@ -105,6 +105,7 @@ export async function votar(
 ) {
   const perfil = await getCurrentProfile();
   if (!perfil) throw new Error("É preciso estar autenticado para votar.");
+  if (!isAtivo(perfil)) throw new Error("Sua conta ainda não está ativa no grupo.");
 
   const supabase = await createClient();
 

@@ -27,38 +27,49 @@ export async function GET(request: NextRequest) {
   const user = data.user;
   const admin = createAdminClient();
 
-  const { data: perfilExistente } = await admin
+  // erro do banco aqui não pode virar "entrou sem perfil": a pessoa cairia na
+  // tela de sem cadastro sem saber que o problema foi nosso
+  async function falhou() {
+    await supabase.auth.signOut();
+    return NextResponse.redirect(`${origin}/entrar?erro=falha-cadastro`);
+  }
+
+  const { data: perfilExistente, error: erroPerfil } = await admin
     .from("profiles")
     .select("id")
     .eq("auth_user_id", user.id)
     .maybeSingle();
+  if (erroPerfil) return falhou();
 
   if (perfilExistente) {
     return NextResponse.redirect(`${origin}${next}`);
   }
 
   const email = user.email!;
-  const { data: perfilPorEmail } = await admin
+  const { data: perfilPorEmail, error: erroEmail } = await admin
     .from("profiles")
     .select("id, auth_user_id")
     .eq("email", email)
     .is("auth_user_id", null)
     .maybeSingle();
+  if (erroEmail) return falhou();
 
   if (perfilPorEmail) {
-    await admin
+    const { error } = await admin
       .from("profiles")
       .update({ auth_user_id: user.id })
       .eq("id", perfilPorEmail.id);
+    if (error) return falhou();
     return NextResponse.redirect(`${origin}${next}`);
   }
 
   if (inviteCode) {
-    const { data: invite } = await admin
+    const { data: invite, error: erroConvite } = await admin
       .from("invites")
       .select("id, role, gat_id, expires_at, revoked_at")
       .eq("code", inviteCode)
       .maybeSingle();
+    if (erroConvite) return falhou();
 
     const inviteValido =
       invite &&
@@ -73,7 +84,7 @@ export async function GET(request: NextRequest) {
       const nomeExibicao =
         nomeExibicaoParam || nomeCompleto.split(" ")[0] || email;
 
-      await admin.from("profiles").insert({
+      const { error } = await admin.from("profiles").insert({
         auth_user_id: user.id,
         nome_completo: nomeCompleto,
         nome_exibicao: nomeExibicao,
@@ -85,6 +96,7 @@ export async function GET(request: NextRequest) {
         status: "pendente",
         invite_id: invite.id,
       });
+      if (error) return falhou();
 
       return NextResponse.redirect(`${origin}${next}`);
     }

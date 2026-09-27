@@ -95,5 +95,8 @@ function mensagemErro(codigo?: string) {
   if (codigo === "link-invalido") {
     return "O link expirou ou já foi usado. Tente entrar novamente.";
   }
+  if (codigo === "falha-cadastro") {
+    return "Não foi possível concluir sua entrada. Tente de novo em instantes; se continuar, avise a coordenação.";
+  }
   return null;
 }
