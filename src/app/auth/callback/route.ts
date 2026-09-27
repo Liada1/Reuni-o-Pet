@@ -5,7 +5,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  // só caminho interno: `@site.com`, `//site.com` ou `/\site.com` sairiam do domínio
+  const nextParam = searchParams.get("next") ?? "/";
+  const next = /^\/(?![/\\])/.test(nextParam) ? nextParam : "/";
   const inviteCode = searchParams.get("invite");
   const nomeCompletoParam = searchParams.get("nome_completo");
   const nomeExibicaoParam = searchParams.get("nome_exibicao");

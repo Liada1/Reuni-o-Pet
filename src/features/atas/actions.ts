@@ -426,13 +426,28 @@ export async function mudarStatusAta(minutesId: string, meetingId: string, statu
   if (status === "aprovada" && !isCoordenacao(perfil)) {
     throw new Error("Só a coordenação aprova a ata.");
   }
+  const statusAnterior: Partial<Record<MinuteStatus, MinuteStatus>> = {
+    em_revisao: "rascunho",
+    aprovada: "em_revisao",
+  };
+  const esperado = statusAnterior[status];
+  if (!esperado) throw new Error("Mudança de status inválida.");
+
   const supabase = await createClient();
   const dados =
     status === "aprovada"
       ? { status, aprovada_por: perfil.id, aprovada_em: new Date().toISOString() }
       : { status };
-  const { error } = await supabase.from("minutes").update(dados).eq("id", minutesId);
+  const { data, error } = await supabase
+    .from("minutes")
+    .update(dados)
+    .eq("id", minutesId)
+    .eq("status", esperado)
+    .select("id");
   if (error) throw new Error(error.message);
+  if (!data?.length) {
+    throw new Error("O status da ata mudou enquanto você estava na tela. Recarregue a página.");
+  }
   revalidatePath(`/reunioes/${meetingId}/ata`);
   revalidatePath("/atas");
 }

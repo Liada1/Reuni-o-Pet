@@ -67,6 +67,7 @@ export function RevisaoAta({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [erroStatus, setErroStatus] = useState<string | null>(null);
 
   const topicos = ata.agendaItems.filter((i) => i.aceito);
   const decisoes = ata.notes.filter((n) => n.tipo === "decisao");
@@ -83,9 +84,14 @@ export function RevisaoAta({
   });
 
   function mudarStatus(status: MinuteStatus) {
+    setErroStatus(null);
     startTransition(async () => {
-      await mudarStatusAta(ata.minute.id, ata.meeting.id, status);
-      router.refresh();
+      try {
+        await mudarStatusAta(ata.minute.id, ata.meeting.id, status);
+        router.refresh();
+      } catch (e) {
+        setErroStatus(e instanceof Error ? e.message : "Não foi possível mudar o status da ata.");
+      }
     });
   }
 
@@ -289,6 +295,11 @@ export function RevisaoAta({
             </Button>
           </a>
         </div>
+        {erroStatus && (
+          <p role="alert" className="text-sm text-alert">
+            {erroStatus}
+          </p>
+        )}
         {pdfs.length > 0 && (
           <div className="space-y-1 border-t border-border pt-3">
             <p className="text-xs font-medium text-ink-muted">Versões geradas</p>
