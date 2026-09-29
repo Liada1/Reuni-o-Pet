@@ -27,6 +27,18 @@ const ABAS: { chave: ProfileStatus; nome: string }[] = [
 export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats: Gat[] }) {
   const [aba, setAba] = useState<ProfileStatus>("pendente");
   const [pending, startTransition] = useTransition();
+  const [erro, setErro] = useState<string | null>(null);
+
+  function executar(acao: () => Promise<void>, falha: string) {
+    setErro(null);
+    startTransition(async () => {
+      try {
+        await acao();
+      } catch (e) {
+        setErro(e instanceof Error ? e.message : falha);
+      }
+    });
+  }
 
   const filtrados = membros.filter((m) => m.status === aba);
   const pendentesCount = membros.filter((m) => m.status === "pendente").length;
@@ -56,6 +68,12 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
         ))}
       </div>
 
+      {erro && (
+        <p role="alert" className="text-sm text-alert">
+          {erro}
+        </p>
+      )}
+
       {filtrados.length === 0 ? (
         <EstadoVazio
           icone={Users}
@@ -81,11 +99,13 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
                 value={m.role}
                 disabled={pending}
                 className="w-auto"
-                onChange={(e) =>
-                  startTransition(() =>
-                    atualizarPapelEGat(m.id, { role: e.target.value as ProfileRole }),
-                  )
-                }
+                onChange={(e) => {
+                  const role = e.target.value as ProfileRole;
+                  executar(
+                    () => atualizarPapelEGat(m.id, { role }),
+                    "Não foi possível trocar o perfil.",
+                  );
+                }}
               >
                 <option value="participante">Participante</option>
                 <option value="relator">Relator(a)</option>
@@ -97,11 +117,13 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
                 value={m.gat_id ?? ""}
                 disabled={pending}
                 className="w-auto"
-                onChange={(e) =>
-                  startTransition(() =>
-                    atualizarPapelEGat(m.id, { gat_id: e.target.value || null }),
-                  )
-                }
+                onChange={(e) => {
+                  const gat_id = e.target.value || null;
+                  executar(
+                    () => atualizarPapelEGat(m.id, { gat_id }),
+                    "Não foi possível trocar o GAT.",
+                  );
+                }}
               >
                 <option value="">Sem GAT</option>
                 {gats.map((g) => (
@@ -114,7 +136,7 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
               {m.status === "pendente" && (
                 <Button
                   type="button"
-                  onClick={() => startTransition(() => aprovarMembro(m.id))}
+                  onClick={() => executar(() => aprovarMembro(m.id), "Não foi possível aprovar.")}
                   disabled={pending}
                 >
                   Aprovar
@@ -124,7 +146,7 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
                 <Button
                   type="button"
                   variant="secundario"
-                  onClick={() => startTransition(() => desativarMembro(m.id))}
+                  onClick={() => executar(() => desativarMembro(m.id), "Não foi possível desativar.")}
                   disabled={pending}
                 >
                   Desativar
@@ -134,7 +156,7 @@ export function MembrosLista({ membros, gats }: { membros: MembroComGat[]; gats:
                 <Button
                   type="button"
                   variant="secundario"
-                  onClick={() => startTransition(() => reativarMembro(m.id))}
+                  onClick={() => executar(() => reativarMembro(m.id), "Não foi possível reativar.")}
                   disabled={pending}
                 >
                   Reativar

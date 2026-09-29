@@ -31,16 +31,22 @@ export function ConviteGerador({
   const [gatId, setGatId] = useState<string>("");
   const [expiraEmDias, setExpiraEmDias] = useState<string>("");
   const [link, setLink] = useState<string | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function gerar() {
+    setErro(null);
     startTransition(async () => {
-      const { code } = await gerarConvite({
-        role,
-        gat_id: gatId || null,
-        expira_em_dias: expiraEmDias ? Number(expiraEmDias) : null,
-      });
-      setLink(`${window.location.origin}/convite/${code}`);
+      try {
+        const { code } = await gerarConvite({
+          role,
+          gat_id: gatId || null,
+          expira_em_dias: expiraEmDias ? Number(expiraEmDias) : null,
+        });
+        setLink(`${window.location.origin}/convite/${code}`);
+      } catch (e) {
+        setErro(e instanceof Error ? e.message : "Não foi possível gerar o convite.");
+      }
     });
   }
 
@@ -113,6 +119,11 @@ export function ConviteGerador({
         <LinkIcon className="h-4 w-4" strokeWidth={1.75} />
         {pending ? "Gerando…" : "Gerar link de convite"}
       </Button>
+      {erro && (
+        <p role="alert" className="text-sm text-alert">
+          {erro}
+        </p>
+      )}
     </div>
   );
 }

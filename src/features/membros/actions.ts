@@ -71,6 +71,8 @@ export async function cadastrarMembroDireto(dados: {
   const supabase = await createClient();
   const { error } = await supabase.from("profiles").insert({
     ...dados,
+    // o login devolve o e-mail em minúsculas, e é por ele que o callback acha este cadastro
+    email: dados.email.trim().toLowerCase(),
     telefone: dados.telefone || null,
     status: "ativo",
   });
