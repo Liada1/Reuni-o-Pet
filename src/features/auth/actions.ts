@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { mensagemErroLogin } from "./mensagens";
 
 export interface DadosConvite {
   invite?: string;
@@ -33,7 +34,7 @@ export async function enviarLinkMagico(email: string, dados: DadosConvite) {
   });
 
   if (error) {
-    return { erro: error.message };
+    return { erro: mensagemErroLogin(error) };
   }
   return { erro: null };
 }
@@ -50,7 +51,7 @@ export async function entrarComGoogle(dados: DadosConvite) {
   });
 
   if (error || !data.url) {
-    return { erro: error?.message ?? "Não foi possível iniciar o login com Google.", url: null };
+    return { erro: "Não foi possível iniciar o login com Google. Tente de novo.", url: null };
   }
   return { erro: null, url: data.url };
 }
